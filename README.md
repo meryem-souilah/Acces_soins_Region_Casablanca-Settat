@@ -46,9 +46,6 @@ archive/             anciens fichiers conservés pour référence
 
 ## Installation de l'environnement
 
-Prérequis : Git, [Miniconda](https://docs.conda.io/en/latest/miniconda.html),
-QGIS 3.x LTR.
-
 ```bash
 git clone https://github.com/meryem-souilah/Acces_soins_Region_Casablanca-Settat.git
 cd Acces_soins_Region_Casablanca-Settat
@@ -62,7 +59,7 @@ Sans conda : `pip install -r requirements.txt` (Python ≥ 3.10).
 
 | Phase | Séance | Statut |
 |---|---|---|
-| 0. Choix du thème et audit des sources | Séance 2 | 🟡 En cours |
+| 0. Choix du thème et audit des sources | Séance 2 | 🟡 Réaliser |
 | 1. Collecte (script reproductible) | Séance 3 | ⚪ À venir |
 | 2. Pré-traitement et géodatabase PostGIS | Séance 4 | ⚪ À venir |
 | 3. Traitement et Geo-AI | Séance 5 | ⚪ À venir |
@@ -73,8 +70,8 @@ Sans conda : `pip install -r requirements.txt` (Python ≥ 3.10).
 
 | N° | Membre | Lead avant la séance |
 |---|---|---|
-| M1 | _Nom 1_ | 2 et 7 |
-| M2 | _Nom 2_ | 3 |
-| M3 | _Nom 3_ | 4 |
-| M4 | _Nom 4_ | 5 |
-| M5 | _Nom 5_ | 6 |
+| M1 | _Nom 1_ | SOUILAH Meryem |
+| M2 | _Nom 2_ | Manyani Hiba |
+| M3 | _Nom 3_ | ZOUHRI Imane|
+| M4 | _Nom 4_ | BELMOKHTARE Fatima Ezzahra|
+| M5 | _Nom 5_ | GUEROUANE Imane|
