@@ -24,12 +24,20 @@ Usage :
     python scripts/collecte.py                     # tout, en réutilisant le cache
     python scripts/collecte.py --etapes sante routes
     python scripts/collecte.py --force             # retélécharge tout
+    python scripts/collecte.py --archiver          # fige les sources brutes dans sauvegarde_sources/
+    python scripts/collecte.py --depuis-archive sauvegarde_sources/sources_brutes_AAAA-MM-JJ.zip
+
+Reproductibilité dans le temps : les sources en ligne évoluent (OSM change chaque
+jour, Geofabrik ne garde que le dernier extrait). L'archive contient les fichiers
+bruts exacts et le manifeste ; --depuis-archive les restaure, vérifie leurs
+SHA-256 puis rejoue le traitement : le jeu de données obtenu est identique.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import os
 import sys
 import time
 import unicodedata
@@ -347,7 +355,13 @@ def _extrait_geofabrik(dossier: Path, force: bool) -> tuple[str, Path, str, str]
     """
     import re
 
-    candidats = [] if force else sorted(
+    # L'extrait inscrit au manifeste passe en premier : un extrait plus récent
+    # déposé à côté ne change pas le jeu de données tant qu'on ne force pas.
+    connus = [] if force else [
+        (C.RACINE / f["chemin"]) for f in
+        charger_manifest()["sources"].get("routes", {}).get("fichiers_origine", [])]
+    connus = [p.parent if p.suffix == ".shp" else p for p in connus if p.exists()]
+    candidats = [] if force else connus or sorted(
         [d for d in dossier.glob("morocco-*-free.shp") if (d / C.GEOFABRIK_COUCHE_ROUTES).exists()]
         + list(dossier.glob("morocco-*-free.shp.zip")), key=lambda p: p.stat().st_mtime)
     url = "(extrait déjà présent)"
@@ -730,6 +744,59 @@ def ecrire_sources(m: dict) -> None:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Archive des sources brutes : la reproductibilité dans le temps
+# ─────────────────────────────────────────────────────────────────────────────
+ARCHIVES = C.RACINE / "sauvegarde_sources"
+
+
+def _fichiers_bruts(m: dict) -> list[Path]:
+    """Fichiers d'origine de toutes les sources ; un shapefile emporte ses annexes et le README."""
+    fichiers = []
+    for s in m["sources"].values():
+        for f in s.get("fichiers_origine", []):
+            p = C.RACINE / f["chemin"]
+            if p.suffix == ".shp":
+                fichiers += sorted(p.parent.glob(p.stem + ".*"))
+                fichiers += [r for r in [p.parent / "README"] if r.exists()]
+            else:
+                fichiers.append(p)
+    return fichiers
+
+
+def archiver(m: dict) -> Path:
+    """Zip des fichiers bruts exacts + manifeste, nommé d'après la date de collecte."""
+    if not m["sources"] or any(s.get("statut") != "OK" for s in m["sources"].values()):
+        raise SystemExit("Archive refusée : toutes les sources doivent être au statut OK.")
+    ARCHIVES.mkdir(exist_ok=True)
+    cible = ARCHIVES / f"sources_brutes_{m['derniere_collecte'][:10]}.zip"
+    with zipfile.ZipFile(cible, "w", zipfile.ZIP_DEFLATED) as z:
+        for f in _fichiers_bruts(m) + [MANIFEST]:
+            print(f"    + {f.relative_to(C.RACINE).as_posix()}")
+            z.write(f, f.relative_to(C.RACINE).as_posix())
+    print(f"Archive : {cible} ({cible.stat().st_size / 1e6:.0f} Mo), SHA-256 {sha256(cible)}")
+    return cible
+
+
+def restaurer(archive: Path) -> None:
+    """Remet les fichiers bruts de l'archive en place et vérifie leurs empreintes."""
+    with zipfile.ZipFile(archive) as z:
+        for info in z.infolist():
+            if not info.filename.startswith("donnees_brutes/") or ".." in info.filename:
+                raise SystemExit(f"Entrée inattendue dans l'archive : {info.filename}")
+        for info in z.infolist():
+            chemin = z.extract(info, C.RACINE)
+            # La date du fichier sert de date de téléchargement : on garde celle d'origine
+            t = time.mktime(info.date_time + (0, 0, -1))
+            os.utime(chemin, (t, t))
+    reference = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    for s in reference["sources"].values():
+        for f in s.get("fichiers_origine", []):
+            if sha256(C.RACINE / f["chemin"]) != f["sha256"]:
+                raise SystemExit(f"Empreinte différente pour {f['chemin']} : archive altérée.")
+            print(f"    SHA-256 conforme : {f['chemin']}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -738,7 +805,21 @@ def main():
     p.add_argument("--routes", choices=list(C.ROUTES_FILTRES), default="complet",
                    help="complet = toutes voies circulables et pistes ; principal = sans voies "
                         "résidentielles, de service ni pistes")
+    p.add_argument("--archiver", action="store_true",
+                   help="fige les fichiers bruts actuels et le manifeste dans sauvegarde_sources/, puis s'arrête")
+    p.add_argument("--depuis-archive", type=Path, metavar="ZIP",
+                   help="restaure les fichiers bruts d'une archive, vérifie leur SHA-256, puis rejoue")
     a = p.parse_args()
+
+    if a.archiver:
+        archiver(charger_manifest())
+        return
+    if a.depuis_archive:
+        if a.force:
+            raise SystemExit("--force et --depuis-archive sont incompatibles : l'archive remplace le "
+                             "téléchargement.")
+        print(f"[archive] {a.depuis_archive}")
+        restaurer(a.depuis_archive)
 
     fonctions = {"limites": etape_limites, "sante": etape_sante,
                  "routes": lambda f: etape_routes(f, a.routes),

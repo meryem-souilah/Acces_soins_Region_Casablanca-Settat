@@ -1,0 +1,664 @@
+% =============================================================================
+%  Séance 3 — Acquisition des données
+%  Projet « Accès aux soins — région Casablanca-Settat » (Géodata appliquée)
+%
+%  Mise en page entièrement personnalisée (aucun thème Beamer prédéfini).
+%  Compilation : XeLaTeX (recommandé, Overleaf : Menu > Compiler > XeLaTeX)
+%  ou pdfLaTeX. Images attendues dans preuves/ et uml/ à côté du .tex,
+%  ou dans ../preuves/ et ../docs/uml/ depuis le dossier presentation/.
+% =============================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\fi
+\usepackage[french]{babel}
+\frenchsetup{AutoSpacePunctuation=false}   % « EPSG:26191 » sans espace ajoutée
+\usepackage[sfdefault]{FiraSans}
+\usepackage[scaled=0.86]{FiraMono}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,fit}
+
+\graphicspath{{../preuves/}{../docs/uml/}{preuves/}{uml/}}
+\AtBeginDocument{\hyphenpenalty=10000 \exhyphenpenalty=10000}   % pas de césure sur des diapositives
+
+% --- Palette (celle de la carte de contrôle) ---------------------------------
+\definecolor{encre}{HTML}{14232E}
+\definecolor{bleu}{HTML}{2B7BB9}
+\definecolor{sarcelle}{HTML}{1E8A80}
+\definecolor{ambre}{HTML}{C8742A}
+\definecolor{rouge}{HTML}{C0392B}
+\definecolor{gris}{HTML}{6B7280}
+\definecolor{fond}{HTML}{F1F4F7}
+\definecolor{ligne}{HTML}{D9DEE3}
+
+% --- Mise en page --------------------------------------------------------------
+\setbeamersize{text margin left=13mm, text margin right=13mm}
+\setbeamertemplate{navigation symbols}{}
+\setbeamercolor{normal text}{fg=encre, bg=white}
+\setbeamercolor{structure}{fg=bleu}
+\setbeamercolor{alerted text}{fg=ambre}
+\setbeamertemplate{itemize item}{\textcolor{sarcelle}{\rule[0.35ex]{0.75ex}{0.75ex}}}
+\setbeamertemplate{itemize subitem}{\textcolor{gris}{--}}
+\setbeamertemplate{enumerate item}{\textcolor{sarcelle}{\bfseries\insertenumlabel.}}
+
+% Filet vertical à gauche de chaque diapositive courante
+\setbeamertemplate{background}{%
+  \begin{tikzpicture}
+    \useasboundingbox (0,0) rectangle (\paperwidth,\paperheight);
+    \fill[sarcelle] (0,0) rectangle (1.6mm,\paperheight);
+  \end{tikzpicture}}
+
+% Titre : rubrique (partie en cours) puis titre, filet fin
+\setbeamertemplate{frametitle}{%
+  \vskip5mm
+  {\color{ambre}\scriptsize\bfseries\MakeUppercase{\insertsectionhead}}\par
+  \vskip0.8mm
+  {\color{encre}\Large\bfseries\insertframetitle}\par
+  \vskip1.6mm
+  {\color{ligne}\rule{\linewidth}{0.6pt}}}
+
+% Pied de page : projet à gauche, numéro à droite
+\setbeamertemplate{footline}{%
+  \hspace*{13mm}{\color{gris}\tiny Accès aux soins — Casablanca-Settat \enskip·\enskip
+  Séance 3 — Acquisition des données}\hfill
+  {\color{gris}\tiny\bfseries\insertframenumber\,/\,\inserttotalframenumber}\hspace*{13mm}
+  \vskip4mm}
+
+% --- Composants ------------------------------------------------------------------
+\newcommand{\ok}{\textcolor{sarcelle}{\bfseries\checkmark}}
+\newcommand{\afaire}{\textcolor{ambre}{\bfseries à faire}}
+\newcommand{\code}[1]{{\ttfamily\small #1}}
+\newcommand{\petit}[1]{{\footnotesize\color{gris}#1}}
+
+% Carte d'indicateur : couleur, valeur, libellé, précision
+\newcommand{\kpi}[4]{%
+  \begin{tikzpicture}[baseline=(k.north)]
+    \node[fill=fond, rounded corners=3pt, text width=1.95cm, minimum height=2.45cm,
+          align=left, inner sep=2.3mm, anchor=north west] (k) at (0,0)
+      {\raggedright\spaceskip=0.25em plus 0.05em {\color{#1}\fontsize{15}{17}\selectfont\bfseries #2}\\[1.2mm]
+       {\footnotesize\bfseries #3}\\[0.3mm]{\scriptsize\color{gris} #4}};
+    \fill[#1] (k.north west) rectangle ($(k.south west)+(0.9mm,0)$);
+  \end{tikzpicture}}
+
+% Bloc de commande sur fond sombre
+\newcommand{\commande}[1]{%
+  \begin{tikzpicture}
+    \node[fill=encre, rounded corners=3pt, text width=\linewidth-6mm, inner sep=3mm,
+          align=left, text=white] {\ttfamily\small #1};
+  \end{tikzpicture}}
+
+% Recherche d'une image dans les dossiers possibles (\IfFileExists ignore \graphicspath)
+\makeatletter
+\newcommand{\chercherimage}[1]{%
+  \gdef\imagetrouvee{}%
+  \@for\@dossier:={../preuves/,../docs/uml/,preuves/,uml/,}\do{%
+    \IfFileExists{\@dossier#1}{\ifx\imagetrouvee\@empty\xdef\imagetrouvee{\@dossier#1}\fi}{}}}
+\makeatother
+
+% Image si présente, sinon cadre indiquant le fichier attendu
+\newcommand{\imageouattente}[2]{%
+  \chercherimage{#1}%
+  \ifx\imagetrouvee\empty
+    \fcolorbox{ambre}{fond}{\parbox[c][4.5cm][c]{9cm}{\centering
+      \textcolor{ambre}{\bfseries Image manquante}\\[2mm]
+      \small Déposer \texttt{\detokenize{#1}} dans \texttt{preuves/}}}%
+  \else
+    \includegraphics[#2]{\imagetrouvee}%
+  \fi}
+
+% Image si présente, rien sinon
+\newcommand{\imageourien}[2]{%
+  \chercherimage{#1}%
+  \ifx\imagetrouvee\empty\else\includegraphics[#2]{\imagetrouvee}\fi}
+
+% Séparateur de partie : numéro, titre, sous-titre (pleine page sombre)
+\newcommand{\partie}[3]{%
+  \section{#2}
+  {\setbeamertemplate{background}{%
+     \begin{tikzpicture}
+       \useasboundingbox (0,0) rectangle (\paperwidth,\paperheight);
+       \fill[encre] (0,0) rectangle (\paperwidth,\paperheight);
+       \fill[sarcelle] (0,0) rectangle (1.6mm,\paperheight);
+     \end{tikzpicture}}
+   \begin{frame}[plain]
+     \vspace*{12mm}
+     {\color{ambre}\fontsize{60}{60}\selectfont\bfseries #1}\par\vskip5mm
+     {\color{white}\fontsize{26}{30}\selectfont\bfseries #2}\par\vskip3mm
+     {\color{white!65!encre}\large #3}
+   \end{frame}}}
+
+% =============================================================================
+\begin{document}
+
+% ---------------------------------------------------------------- Couverture --
+{\setbeamertemplate{background}{%
+   \begin{tikzpicture}
+     \useasboundingbox (0,0) rectangle (\paperwidth,\paperheight);
+     \fill[encre] (0,0) rectangle (0.54\paperwidth,\paperheight);
+     \fill[sarcelle] (0,0) rectangle (1.6mm,\paperheight);
+     \node at (0.775\paperwidth,0.5\paperheight)
+       {\imageourien{apercu_couches_26191.png}{width=0.42\paperwidth}};
+   \end{tikzpicture}}
+ \begin{frame}[plain]
+   \begin{minipage}[t]{0.38\paperwidth}
+     \raggedright
+     \vspace*{8mm}
+     {\color{ambre}\scriptsize\bfseries GÉODATA APPLIQUÉE · SÉANCE 3}\par\vskip5mm
+     {\color{white}\fontsize{20}{24}\selectfont\bfseries Accès aux soins dans la région Casablanca-Settat}\par\vskip4mm
+     {\color{white!75!encre}\large Acquisition des données :\\ un pipeline de collecte reproductible}\par\vskip10mm
+     {\color{white}\scriptsize
+       SOUILAH Meryem · MANYANI Hiba · ZOUHRI Imane\\[0.6mm]
+       BELMOKHTARE Fatima Ezzahra · GUEROUANE Imane}\par\vskip2mm
+     {\color{white!55!encre}\scriptsize Élèves ingénieurs 3\textsuperscript{e} année}
+   \end{minipage}
+ \end{frame}}
+
+% ---------------------------------------------------------------------- Plan --
+\begin{frame}{Déroulé de la présentation}
+  \vskip3mm
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \foreach \n/\t/\s [count=\i from 0] in {
+        01/{Le défi et la phase}/{question, consignes, organisation},
+        02/{Sources et pipeline}/{5 sources, architecture, choix techniques},
+        03/{Résultats et vérification}/{jeu de données, contrôle, carte, QGIS},
+        04/{Reproductibilité}/{archive, versions figées, preuve par les tests},
+        05/{Démonstration et suite}/{démo live, limites, intersession 3}} {
+      \node[anchor=west, text=ambre, font=\Large\bfseries] at (0,-1.05*\i) {\n};
+      \node[anchor=west, font=\large\bfseries] at (1.4,-1.05*\i+0.13) {\t};
+      \node[anchor=west, font=\footnotesize, text=gris] at (1.4,-1.05*\i-0.3) {\s};
+      \draw[ligne] (0,-1.05*\i-0.6) -- (13.4,-1.05*\i-0.6);
+    }
+  \end{tikzpicture}
+\end{frame}
+
+% =============================================================================
+\partie{01}{Le défi et la phase}{Ce que le projet doit résoudre, et ce que demandait l'intersession 2}
+
+\begin{frame}{Le défi spatial}
+  \begin{tikzpicture}
+    \node[fill=fond, text width=\linewidth-10mm, inner sep=4mm, align=left] (q)
+      {{\color{gris}\scriptsize\bfseries QUESTION À RÉSOUDRE}\\[1.5mm]
+       {\large\bfseries Quelles zones de la région Casablanca-Settat sont mal desservies
+        en établissements de santé, et où faut-il intervenir en priorité ?}};
+    \fill[ambre] (q.north west) rectangle ($(q.south west)+(1.2mm,0)$);
+  \end{tikzpicture}
+  \vskip4mm
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}
+      {\color{sarcelle}\bfseries Mesurer}\par\vskip1mm
+      \footnotesize Le temps d'accès par la route de la population aux hôpitaux, cliniques,
+      médecins et pharmacies.
+    \column{0.31\textwidth}
+      {\color{sarcelle}\bfseries Modéliser}\par\vskip1mm
+      \footnotesize Repérer les zones sous-desservies avec un modèle de machine learning.
+    \column{0.31\textwidth}
+      {\color{sarcelle}\bfseries Recommander}\par\vskip1mm
+      \footnotesize Prioriser les interventions pour la Direction régionale de la Santé,
+      le Conseil régional et les urbanistes.
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Ce que demandait l'intersession 2}
+  \small
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{4.2cm}c@{}}
+    \toprule
+    \textbf{Consigne} & \textbf{Notre réponse} & \\
+    \midrule
+    Environnement : QGIS, PostGIS, GDAL/OGR, Python géospatial & QGIS 4.2, PostgreSQL 16, conda & \ok \\
+    Script Python de collecte, sans aucun clic manuel & \code{collecte.py}, une commande & \ok \\
+    Au moins une deuxième source & 5 sources ouvertes & \ok \\
+    \code{SOURCES.md} : URL, date, licence, CRS, emprise & généré à chaque exécution & \ok \\
+    \code{donnees\_brutes/} versionné, README de provenance & README + manifeste SHA-256 & \ok \\
+    Capture QGIS des couches superposées & EPSG:26191 & \ok \\
+    Démonstration live du script & aujourd'hui & \ok \\
+    \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Organisation du groupe}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.36\textwidth}
+      \vskip2mm
+      {\color{gris}\scriptsize\bfseries LEAD DE L'INTERSESSION 2}\par\vskip1.5mm
+      {\Large\bfseries MANYANI Hiba}\par\vskip1mm
+      \petit{Membre M2 : formule $((S-2) \bmod 5)+1$ avec $S = 3$}\par\vskip5mm
+      {\color{gris}\scriptsize\bfseries ROTATION}\par\vskip1.5mm
+      \footnotesize
+      M1 SOUILAH Meryem · séances 2 et 7\\
+      M2 MANYANI Hiba · séance 3\\
+      M3 ZOUHRI Imane · séance 4\\
+      M4 BELMOKHTARE Fatima Ezzahra · séance 5\\
+      M5 GUEROUANE Imane · séance 6
+    \column{0.58\textwidth}
+      \vskip2mm
+      \small
+      \renewcommand{\arraystretch}{1.5}
+      \begin{tabularx}{\linewidth}{@{}c>{\raggedright\arraybackslash}Xl@{}}
+        \toprule
+        & \textbf{Sous-tâche} & \textbf{Responsable} \\
+        \midrule
+        \textcolor{ambre}{\bfseries A} & Script d'acquisition de la source principale & \textcolor{ambre}{[Nom]} \\
+        \textcolor{ambre}{\bfseries B} & Recherche et test des sources complémentaires & \textcolor{ambre}{[Nom]} \\
+        \textcolor{ambre}{\bfseries C} & Vérification CRS / emprise, contrôle & \textcolor{ambre}{[Nom]} \\
+        \textcolor{ambre}{\bfseries D} & README de provenance et versionnement & \textcolor{ambre}{[Nom]} \\
+        \bottomrule
+      \end{tabularx}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\partie{02}{Sources et pipeline}{Cinq sources ouvertes, trois scripts, une commande}
+
+\begin{frame}{Cinq sources ouvertes, chacune répond à une question}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\linewidth}{@{}>{\bfseries}l>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}Xll@{}}
+    \toprule
+    \normalfont\textbf{Donnée} & \textbf{Producteur} & \textbf{Question du défi} & \textbf{Millésime} & \textbf{Licence} \\
+    \midrule
+    Communes et contour & OpenStreetMap, codes HCP & Dans quel découpage restituer ? & 28/07/2026 & ODbL 1.0 \\
+    Établissements de santé & OpenStreetMap (Overpass) & Où est l'offre de soins ? & 24/07/2026 & ODbL 1.0 \\
+    Réseau routier & OpenStreetMap (Geofabrik) & Par où passent les trajets ? & 14/10/2026 & ODbL 1.0 \\
+    Population 100 m & WorldPop & Où vit la population, finement ? & 2020 & CC BY 4.0 \\
+    Population légale & HCP, RGPH 2024 & Quel est le chiffre officiel ? & 01/09/2024 & Citation \\
+    \bottomrule
+  \end{tabularx}
+  \vskip3mm
+  \small
+  CRS unique de toutes les couches : \alert{\bfseries EPSG:26191} (Merchich / Nord Maroc, en mètres),
+  pour mesurer distances et temps d'accès.
+\end{frame}
+
+\begin{frame}{Architecture du pipeline}
+  \centering
+  \begin{tikzpicture}[
+      font=\scriptsize,
+      src/.style={draw=ligne, fill=white, rounded corners=2pt, minimum width=2.3cm, minimum height=0.85cm, align=center},
+      etape/.style={fill=fond, rounded corners=2pt, minimum width=2.3cm, minimum height=0.95cm, align=center},
+      sortie/.style={draw=ligne, rounded corners=2pt, minimum width=2.3cm, minimum height=0.7cm, align=center, text=gris},
+      fl/.style={-{Stealth[length=1.8mm]}, gris, line width=0.5pt}]
+    \foreach \i/\s/\e/\o in {
+        0/{Overpass\\communes}/{\textbf{1. limites}\\153 communes}/{région, communes},
+        1/{Overpass\\santé}/{\textbf{2. santé}\\1\,588 points}/{établissements},
+        2/{Geofabrik\\routes}/{\textbf{3. routes}\\130\,813 tronçons}/{tronçons},
+        3/{WorldPop\\raster 100 m}/{\textbf{4. worldpop}\\7,47 M hab.}/{raster 26191},
+        4/{hcp.ma\\PDF RGPH}/{\textbf{5. hcp}\\255 lignes}/{tableau CSV}} {
+      \node[src]    (s\i) at (2.72*\i, 0)    {\s};
+      \node[etape]  (e\i) at (2.72*\i, -1.5) {\e};
+      \node[sortie] (o\i) at (2.72*\i, -2.85) {\o};
+      \draw[fl] (s\i) -- (e\i);
+      \draw[fl] (e\i) -- (o\i);
+    }
+    \draw[ambre, line width=1.1pt, rounded corners=2pt] (e0.south west) rectangle (e0.north east);
+    \foreach \i/\j in {0/1,1/2,2/3,3/4} \draw[fl] (e\i) -- (e\j);
+    \node[fill=encre, text=white, rounded corners=2pt, minimum height=0.75cm,
+          minimum width=13.2cm, anchor=north, font=\scriptsize] (ctrl) at ($(o2.south)+(0,-0.45)$)
+      {\textbf{controle\_collecte.py} \enskip·\enskip CRS \enskip·\enskip hors région \enskip·\enskip géométries \enskip·\enskip jointure communes $\leftrightarrow$ HCP 153/153};
+    \foreach \i in {0,...,4} \draw[fl] (o\i) -- (o\i |- ctrl.north);
+    \node[left=1mm of s0, anchor=east, text=gris, font=\tiny, align=right] {sources\\en ligne};
+    \node[left=1mm of e0, anchor=east, text=ambre, font=\tiny\bfseries, align=right] {collecte.py};
+    \node[left=1mm of o0, anchor=east, text=gris, font=\tiny, align=right] {couches\\EPSG:26191};
+  \end{tikzpicture}
+  \vskip2mm
+  \raggedright\footnotesize L'étape \alert{\bfseries limites} produit le contour régional qui découpe les étapes 2 à 4.
+  Chaque étape réécrit le manifeste, le README de provenance et \code{SOURCES.md}.
+\end{frame}
+
+\begin{frame}{Trois scripts, une commande}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.58\textwidth}
+      \footnotesize
+      \renewcommand{\arraystretch}{1.35}
+      \begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+        \code{config.py} & URL, emprise, CRS, filtres : un seul endroit \\
+        \code{collecte.py} & Télécharge, découpe, reprojette, documente \\
+        \code{controle\_collecte.py} & Vérifie, produit rapport et carte \\
+        \code{run\_collecte.bat} & Active l'environnement, enchaîne les deux \\
+      \end{tabularx}
+    \column{0.37\textwidth}
+      {\color{gris}\scriptsize\bfseries ROBUSTESSE}\par\vskip1mm
+      \begin{itemize}\scriptsize\setlength{\itemsep}{0.6mm}
+        \item Serveurs et miroirs essayés tour à tour
+        \item Fichier \code{.part} renommé à la fin seulement
+        \item Une source en échec n'arrête pas les autres
+        \item Code de sortie 0 seulement si tout est conforme
+      \end{itemize}
+  \end{columns}
+  \vskip4mm
+  \commande{\scriptsize run\_collecte.bat \hfill\textcolor{white!55!encre}{collecte complète + contrôle}\\[0.8mm]
+            run\_collecte.bat {-}{-}force {-}{-}etapes sante hcp \hfill\textcolor{white!55!encre}{retéléchargement réel}\\[0.8mm]
+            python scripts\textbackslash collecte.py {-}{-}depuis-archive sauvegarde\_sources\textbackslash ...zip \hfill\textcolor{white!55!encre}{reconstruction exacte}}
+\end{frame}
+
+\begin{frame}{Trois choix techniques, issus de l'audit des sources}
+  \vskip1mm
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}
+      {\color{ambre}\fontsize{20}{20}\selectfont\bfseries 1}\par\vskip1mm
+      {\bfseries Communes OpenStreetMap plutôt que HDX}\par\vskip2mm
+      \footnotesize Le jeu officiel COD-AB du Maroc (HDX) et geoBoundaries s'arrêtent aux provinces.
+      Dans OSM, chaque commune porte son \textbf{code HCP} (\code{06.117.01.03} = Berrechid) :
+      jointure directe avec la population légale.
+    \column{0.31\textwidth}
+      {\color{ambre}\fontsize{20}{20}\selectfont\bfseries 2}\par\vskip1mm
+      {\bfseries Le PDF des tableaux, pas la note de synthèse}\par\vskip2mm
+      \footnotesize Le premier lien HCP pointait vers une note \code{.docx} sans tableau communal.
+      Le bon document : PDF de 138 pages ; lignes de la région filtrées par code \code{06}.
+    \column{0.31\textwidth}
+      {\color{ambre}\fontsize{20}{20}\selectfont\bfseries 3}\par\vskip1mm
+      {\bfseries Extrait Geofabrik plutôt que 100 requêtes Overpass}\par\vskip2mm
+      \footnotesize Mêmes données OSM, datées, en un fichier : quelques minutes au lieu de plusieurs heures.
+      Pistes conservées : elles desservent une partie des douars ruraux.
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\partie{03}{Résultats et vérification}{Un jeu de données complet, contrôlé automatiquement}
+
+\begin{frame}{Le jeu de données obtenu}
+  \vskip2mm
+  \kpi{bleu}{153}{communes}{9 provinces, code HCP}\hfill
+  \kpi{rouge}{1\,588}{établissements}{82 hôpitaux, 74 cliniques}\hfill
+  \kpi{gris}{130\,813}{tronçons}{53\,890 km de voies}\hfill
+  \kpi{ambre}{7,47 M}{habitants}{WorldPop, pixels de 100 m}\hfill
+  \kpi{sarcelle}{153/153}{jointure HCP}{population officielle}
+  \vskip6mm
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{1mm}
+        \item Région : \textbf{20\,207 km²}, union des 153 communes
+        \item 1\,734 établissements dans le rectangle de requête, 146 écartés hors région
+      \end{itemize}
+    \column{0.48\textwidth}
+      \begin{itemize}\setlength{\itemsep}{1mm}
+        \item 149\,134 tronçons lus, 130\,813 après découpe au contour
+        \item 255 lignes HCP pour la région, dont 153 communes
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{CRS uniforme, vérifié automatiquement}
+  \small
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xlrrrc@{}}
+    \toprule
+    \textbf{Couche} & \textbf{CRS} & \textbf{Entités} & \textbf{Invalides} & \textbf{Hors région} & \\
+    \midrule
+    Contour régional & EPSG:26191 & 1 & 0 & — & \ok \\
+    Communes & EPSG:26191 & 153 & 0 & 0 & \ok \\
+    Établissements de santé & EPSG:26191 & 1\,588 & 0 & 0 & \ok \\
+    Réseau routier & EPSG:26191 & 130\,813 & 0 & 0 & \ok \\
+    WorldPop 100 m & EPSG:26191 & 2186 × 1753 px & — & — & \ok \\
+    \bottomrule
+  \end{tabularx}
+  \vskip4mm
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      \begin{tikzpicture}
+        \node[fill=fond, text width=\linewidth-6mm, inner sep=3mm, align=left] (a)
+          {{\color{sarcelle}\bfseries Jointure communes $\leftrightarrow$ HCP}\\[1mm]
+           \footnotesize 153 communes sur 153 ont leur population officielle.};
+        \fill[sarcelle] (a.north west) rectangle ($(a.south west)+(0.9mm,0)$);
+      \end{tikzpicture}
+    \column{0.48\textwidth}
+      \begin{tikzpicture}
+        \node[fill=fond, text width=\linewidth-6mm, inner sep=3mm, align=left] (b)
+          {{\color{sarcelle}\bfseries Reprojection du raster}\\[1mm]
+           \footnotesize Rééchantillonnage par \textbf{somme} : 7\,466\,216 hab.\ avant et après, écart 0,00 \%.};
+        \fill[sarcelle] (b.north west) rectangle ($(b.south west)+(0.9mm,0)$);
+      \end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Toutes les couches, superposées en EPSG:26191}
+  \begin{columns}[c,onlytextwidth]
+    \column{0.6\textwidth}
+      \centering
+      \imageouattente{apercu_couches_26191.png}{height=0.7\textheight}
+    \column{0.36\textwidth}
+      \footnotesize
+      {\color{gris}\scriptsize\bfseries LECTURE}\par\vskip1.5mm
+      \textcolor{rouge}{\rule[0.3ex]{1.2ex}{1.2ex}} Hôpitaux \enskip
+      \textcolor{bleu}{\rule[0.3ex]{1.2ex}{1.2ex}} Communes\\[0.8mm]
+      \textcolor{ambre}{\rule[0.3ex]{1.2ex}{1.2ex}} Population \enskip
+      \textcolor{gris}{\rule[0.3ex]{1.2ex}{1.2ex}} Routes
+      \vskip3mm
+      Hôpitaux et cliniques se concentrent sur le \textbf{littoral} et dans quelques chefs-lieux.
+      \vskip2mm
+      Seules \textbf{18 communes sur 153} contiennent un hôpital ; de grandes zones rurales
+      peuplées n'en ont aucun à proximité.
+      \vskip2mm
+      \petit{C'est l'hypothèse du défi, que les temps d'accès chiffreront.}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Vérification dans QGIS}
+  \centering
+  \imageouattente{capture_qgis_couches_26191.png}{height=0.6\textheight}\\[1.5mm]
+  \scriptsize Projet en EPSG:26191 \enskip·\enskip Berrechid : \code{code\_hcp = 06.117.01.03}
+  \enskip·\enskip 168\,687 habitants dans le tableau HCP
+\end{frame}
+
+% =============================================================================
+\partie{04}{Reproductibilité}{Le même jeu de données, aujourd'hui comme dans un an}
+
+\begin{frame}{Trois garanties, pas une}
+  \petit{Relancer le script dans un an ne suffit pas : OSM change chaque jour,
+  Geofabrik ne garde que le dernier extrait, une URL peut disparaître.}
+  \vskip5mm
+  \begin{columns}[T,onlytextwidth]
+    \column{0.31\textwidth}
+      {\color{sarcelle}\scriptsize\bfseries MÊME CODE}\par\vskip1mm
+      {\large\bfseries Dépôt Git}\par\vskip2mm
+      \footnotesize Scripts, documentation, requêtes Overpass, tableau HCP.
+    \column{0.31\textwidth}
+      {\color{sarcelle}\scriptsize\bfseries MÊME ENVIRONNEMENT}\par\vskip1mm
+      {\large\bfseries Versions figées}\par\vskip2mm
+      \footnotesize \code{environment.yml} + \code{requirements-lock.txt} :
+      Python 3.11.17 et les 48 paquets à la version exacte.
+    \column{0.31\textwidth}
+      {\color{sarcelle}\scriptsize\bfseries MÊMES DONNÉES}\par\vskip1mm
+      {\large\bfseries Archive des sources}\par\vskip2mm
+      \footnotesize Les fichiers bruts exacts et le manifeste : 547 Mo compressés en 262 Mo.
+      Chaque fichier vérifié par son empreinte \textbf{SHA-256}.
+  \end{columns}
+  \vskip4mm
+  \commande{\scriptsize python scripts\textbackslash collecte.py {-}{-}archiver \hfill\textcolor{white!55!encre}{fige les sources brutes}\\[0.8mm]
+            python scripts\textbackslash collecte.py {-}{-}depuis-archive sauvegarde\_sources\textbackslash sources\_brutes\_2026-10-22.zip}
+\end{frame}
+
+\begin{frame}{La preuve : deux reconstructions depuis un dossier vide}
+  \small
+  \renewcommand{\arraystretch}{1.18}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xrrr@{}}
+    \toprule
+    & \textbf{Jeu archivé} & \textbf{Depuis l'archive} & \textbf{Depuis Internet} \\
+    & \petit{collecte du 21/10} & \petit{hors ligne, 5 min} & \petit{22/10, 23 min} \\
+    \midrule
+    Communes & 153 & 153 & 153 \\
+    Établissements de santé & 1\,588 & 1\,588 & \textcolor{ambre}{\bfseries 1\,577} \\
+    Tronçons routiers & 130\,813 & 130\,813 & \textcolor{ambre}{\bfseries 130\,856} \\
+    Population WorldPop & 7\,466\,216 & 7\,466\,216 & 7\,466\,216 \\
+    Jointure HCP & 153/153 & 153/153 & 153/153 \\
+    Contrôle & — & \ok\ code 0 & \ok\ code 0 \\
+    \bottomrule
+  \end{tabularx}
+  \vskip3mm
+  \footnotesize
+  \textbf{Le code est reproductible} : les deux reconstructions passent le contrôle.
+  \textbf{Les sources évoluent} : en un jour, OSM et Geofabrik ont changé.
+  Seule l'archive redonne \textbf{exactement} le jeu présenté.
+\end{frame}
+
+\begin{frame}{Provenance et versionnement}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+      {\color{gris}\scriptsize\bfseries GÉNÉRÉ À CHAQUE EXÉCUTION}\par\vskip2mm
+      \small
+      \begin{itemize}\setlength{\itemsep}{1.5mm}
+        \item \code{SOURCES.md} : URL, licence, millésime, date de téléchargement,
+              CRS d'origine $\rightarrow$ produit, emprise, volume
+        \item \code{donnees\_brutes/README.md} : fiche par source, fichiers et SHA-256
+        \item \code{manifest.json} : la même provenance, lisible par machine
+      \end{itemize}
+      \vskip2mm
+      \petit{Jamais modifiés à la main : ils ne peuvent pas diverger des données.}
+    \column{0.42\textwidth}
+      {\color{gris}\scriptsize\bfseries CE QUE GIT VERSIONNE}\par\vskip2mm
+      \small
+      \begin{itemize}\setlength{\itemsep}{1.5mm}
+        \item[\ok] Code, README, manifeste, \code{SOURCES.md}
+        \item[\ok] Requêtes Overpass, tableau HCP (CSV)
+        \item[\ok] Diagrammes UML, projet QGIS
+        \item[\textcolor{gris}{×}] Rasters, GeoPackage, extraits OSM
+      \end{itemize}
+      \vskip2mm
+      \petit{Limite GitHub : 100 Mo par fichier. L'archive est publiée en Release.}
+  \end{columns}
+\end{frame}
+
+% =============================================================================
+\partie{05}{Démonstration et suite}{Le script en direct, puis les limites et l'intersession 3}
+
+\begin{frame}{Démonstration live}
+  \vskip1mm
+  \begin{tikzpicture}[x=1cm,y=1cm]
+    \foreach \n/\t/\c/\d [count=\i from 0] in {
+        1/{Retéléchargement réel, puis contrôle automatique}/{run\_collecte.bat {-}{-}force {-}{-}etapes sante hcp}/{Requêtes vers Overpass et hcp.ma ; le chiffre peut varier : OSM évolue},
+        2/{Reconstruction exacte depuis l'archive}/{collecte.py {-}{-}depuis-archive sauvegarde\_sources\textbackslash ...zip}/{SHA-256 vérifiés, retour à 1\,588 et 130\,813},
+        3/{Provenance}/{SOURCES.md et donnees\_brutes\textbackslash README.md}/{Millésime, licence, emprise, empreintes},
+        4/{Vérification visuelle}/{preuves\textbackslash verification\_couches\_26191.qgz}/{Superposition en EPSG:26191, code HCP d'une commune}} {
+      \node[circle, fill=encre, text=white, font=\small\bfseries, minimum size=6mm] at (0,-1.32*\i) {\n};
+      \node[anchor=west, font=\normalsize\bfseries] at (0.6,-1.32*\i+0.2) {\t};
+      \node[anchor=west, font=\ttfamily\scriptsize, text=bleu] at (0.6,-1.32*\i-0.17) {\c};
+      \node[anchor=west, font=\scriptsize, text=gris] at (0.6,-1.32*\i-0.5) {\d};
+    }
+  \end{tikzpicture}
+\end{frame}
+
+\begin{frame}{Difficultés rencontrées et solutions}
+  \footnotesize
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Problème} & \textbf{Cause} & \textbf{Solution} \\
+    \midrule
+    Pas de communes dans les limites HDX & COD-AB Maroc limité aux provinces & Communes OSM avec code HCP \\
+    Le « PDF HCP » ne s'ouvrait pas & C'était la note \code{.docx}, mauvaise URL & PDF des tableaux, signature \code{\%PDF-} vérifiée \\
+    Routes : plusieurs heures, délais dépassés & Environ 100 requêtes Overpass saturées & Extrait Geofabrik filtré à la lecture \\
+    « EPSG code is unknown » & \code{PROJ\_LIB} de PostgreSQL trop ancien & Correctif automatique dans \code{config.py} \\
+    Chiffres différents d'un jour à l'autre & Sources en ligne qui évoluent & Archive des sources + SHA-256 \\
+    \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\begin{frame}{Limites connues des données}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      {\color{ambre}\bfseries Complétude d'OSM}\par\vskip1mm
+      \footnotesize Source contributive : 8,8 \% des établissements sans nom ;
+      les pharmacies représentent 79 \% des points. À mesurer en phase qualité.
+      \vskip4mm
+      {\color{ambre}\normalsize\bfseries Millésimes différents}\par\vskip1mm
+      \footnotesize Le serveur Overpass utilisé a plusieurs mois de retard (juillet 2026) ;
+      routes au 14/10/2026 ; WorldPop 2020 ; recensement au 1\textsuperscript{er} septembre 2024.
+    \column{0.48\textwidth}
+      {\color{ambre}\bfseries Réseau non topologisé}\par\vskip1mm
+      \footnotesize Les tronçons ne sont pas encore reliés aux intersections ;
+      le graphe routier (ponts, tunnels) se construit au pré-traitement.
+      \vskip4mm
+      {\color{ambre}\normalsize\bfseries WorldPop est une estimation}\par\vskip1mm
+      \footnotesize Il sera calé sur la population légale HCP, commune par commune.
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Pourquoi une grille hexagonale H3 pour la suite}
+  \vskip1mm
+  \kpi{ambre}{× 912}{surface}{de 0,4 à 383 km² selon la commune}\hfill
+  \kpi{ambre}{× 1\,531}{population}{de 2\,101 à 3,2 M d'habitants}\hfill
+  \kpi{rouge}{18}{communes}{sur 153 ont un hôpital}\hfill
+  \kpi{sarcelle}{27\,000}{hexagones}{résolution 8, 0,74 km² chacun}
+  \vskip5mm
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      Une moyenne sur une grande commune rurale \textbf{cache les douars isolés},
+      précisément ceux que le défi doit repérer. Des cellules de même taille rendent
+      chaque mesure comparable et donnent assez d'exemples au modèle.
+    \column{0.48\textwidth}
+      6 voisins à égale distance, validation croisée spatiale par blocs
+      (\code{cell\_to\_parent}), puis agrégation par commune pour les recommandations.
+      Extension \code{h3-pg} déjà présente dans PostgreSQL 16.
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Intersession 3 : pré-traitement et géodatabase}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.47\textwidth}
+      {\color{sarcelle}\bfseries Nettoyage tracé}\par\vskip1.5mm
+      \begin{itemize}\footnotesize\setlength{\itemsep}{1.2mm}
+        \item \code{ST\_MakeValid}, doublons, hors emprise ; rapport avant/après
+        \item Mode \code{{-}{-}dry-run} : rapport seul, sans modification
+        \item \textbf{Désaccord topologique réel} : interstices et chevauchements
+              entre communes OSM voisines, aujourd'hui refermés par un tampon de ±5 m
+        \item Topologie du réseau routier : nœuds aux intersections, ponts et tunnels
+      \end{itemize}
+    \column{0.47\textwidth}
+      {\color{sarcelle}\bfseries Schéma PostGIS}\par\vskip1.5mm
+      \begin{itemize}\footnotesize\setlength{\itemsep}{1.2mm}
+        \item Tables \code{commune}, \code{population\_legale}, \code{etablissement},
+              \code{troncon}, \code{hexagone}
+        \item Clé étrangère sur le \textbf{code HCP}, déjà apparié 153/153
+        \item Import \code{ogr2ogr}, index spatiaux GIST
+        \item 3 requêtes métier avec \code{EXPLAIN ANALYZE}
+        \item Base peuplée et dump restaurable
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Le modèle de données, base du schéma PostGIS}
+  \centering
+  \imageouattente{classes_donnees.png}{height=0.62\textheight}\\[1mm]
+  \petit{Diagramme de classes UML des couches produites par la collecte.}
+\end{frame}
+
+\begin{frame}{Bilan au regard du barème de l'intersession 2}
+  \small
+  \renewcommand{\arraystretch}{1.5}
+  \begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}Xc>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    \textbf{Critère} & \textbf{Points} & \textbf{Preuve présentée} \\
+    \midrule
+    Environnement fonctionnel et script reproductible ($\geq$ 2 sources) & 6 & 5 sources, une commande, reconstruction vérifiée depuis un dossier vide \\
+    CRS uniforme et vérifié & 3 & Contrôle automatique : tout en EPSG:26191, code de sortie 0 \\
+    \code{SOURCES.md} et README de provenance complets & 3 & URL, millésime, licence, CRS, emprise, volume, SHA-256 \\
+    Capture QGIS de vérification & 2 & Projet généré par script, capture en EPSG:26191 \\
+    \bottomrule
+  \end{tabularx}
+\end{frame}
+
+% --------------------------------------------------------------------- Fin --
+{\setbeamertemplate{background}{%
+   \begin{tikzpicture}
+     \useasboundingbox (0,0) rectangle (\paperwidth,\paperheight);
+     \fill[encre] (0,0) rectangle (\paperwidth,\paperheight);
+     \fill[sarcelle] (0,0) rectangle (1.6mm,\paperheight);
+   \end{tikzpicture}}
+ \begin{frame}[plain]
+   \vspace*{18mm}
+   {\color{white}\fontsize{30}{34}\selectfont\bfseries Merci.}\par\vskip3mm
+   {\color{ambre}\Large Questions ?}\par\vskip14mm
+   {\color{white!55!encre}\scriptsize github.com/meryem-souilah/Acces\_soins\_Region\_Casablanca-Settat}
+ \end{frame}}
+
+\end{document}

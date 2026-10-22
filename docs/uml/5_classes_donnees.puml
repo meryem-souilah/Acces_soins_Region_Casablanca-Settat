@@ -1,0 +1,81 @@
+@startuml classes_donnees
+!include style.iuml
+title Modèle de données produit par la collecte (toutes les couches en EPSG:26191)
+hide methods
+
+class Region <<GeoPackage : region>> {
+  nom : texte = "Casablanca-Settat"
+  code_hcp : texte = "06"
+  geometry : MultiPolygon
+  --
+  surface : 20 207 km²
+}
+
+class Commune <<GeoPackage : communes>> {
+  code_hcp : texte {clé, ex. 06.117.01.03}
+  code_province : texte
+  nom : texte
+  nom_ar : texte
+  osm_id : texte
+  wikidata : texte
+  surface_km2 : réel
+  geometry : MultiPolygon
+}
+
+class PopulationLegale <<CSV : tableaux_bruts_region>> {
+  code_geographique : texte
+  collectivite : texte
+  collectivite_ar : texte
+  marocains : texte
+  etrangers : texte
+  population : texte
+  menages : texte
+  page, tableau, ligne : entier
+}
+
+class EtablissementSante <<GeoPackage : etablissements_sante>> {
+  osm_id : texte
+  name, name_fr, name_ar : texte
+  amenity : texte
+  healthcare : texte
+  operator, operator_type : texte
+  beds, emergency : texte
+  opening_hours : texte
+  geometry : Point
+}
+
+class Troncon <<GeoPackage : troncons>> {
+  osm_id : texte
+  fclass : texte
+  name, ref : texte
+  oneway, maxspeed : texte
+  layer, bridge, tunnel : texte
+  longueur_m : réel
+  geometry : LineString
+}
+
+class PopulationMaillee <<GeoTIFF : worldpop_26191>> {
+  pixel : 100 m × 100 m
+  valeur : habitants (réel)
+  total : 7 466 216 hab.
+}
+
+Region "1" *-- "153" Commune : composée de
+Commune "1" -- "0..1" PopulationLegale : code_hcp =\ncode_geographique
+Commune "1" o-- "*" EtablissementSante : contient
+Region "1" o-- "130 813" Troncon : découpe
+Region "1" o-- "1" PopulationMaillee : découpe
+
+note right of Commune
+  Jointure par code HCP :
+  153 / 153 communes appariées.
+  Établissements rattachés par
+  jointure spatiale (intersession 3).
+end note
+
+note bottom of PopulationLegale
+  Import brut : nombres au format texte (« 168,687 »).
+  Les 24 arrondissements et préfectures d'arrondissements
+  de Casablanca n'ont pas de polygone (niveau sous-communal).
+end note
+@enduml

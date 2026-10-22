@@ -1,23 +1,12 @@
-# Environnement conda du projet — recommandé (surtout sous Windows) :
-# conda-forge fournit GDAL/PROJ déjà compilés, sans conflit de versions.
+# Environnement du projet, versions figées :
 #   conda env create -f environment.yml
 #   conda activate geodata-sante
+# Python vient de conda ; les bibliothèques sont des wheels pip qui embarquent
+# leurs propres GDAL/PROJ (aucun conflit avec PostgreSQL/PostGIS sous Windows).
+# requirements-lock.txt = l'environnement exact qui a produit le jeu de données.
 name: geodata-sante
-channels:
-  - conda-forge
 dependencies:
-  - python=3.11
-  - gdal            # ogr2ogr, gdalinfo (phases 1 à 3)
-  - geopandas>=0.14
-  - rasterio
-  - shapely>=2
-  - pyproj
-  - osmnx>=1.9
-  - matplotlib
-  - pdfplumber
-  - requests
-  - psycopg2        # connexion PostGIS (intersession 3)
-  - sqlalchemy
-  - geoalchemy2
-  - scikit-learn    # Geo-AI (intersession 4)
-  - jupyterlab
+  - python=3.11.17
+  - pip
+  - pip:
+      - -r requirements-lock.txt
