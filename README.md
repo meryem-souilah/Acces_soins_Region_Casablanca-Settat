@@ -116,12 +116,6 @@ docs/                document de 1er jet, schémas, documentation
 | 4. Contrôle qualité | Séance 6 | ⚪ À venir |
 | 5. Diffusion et recommandations | Séance 7 | ⚪ À venir |
 
-## Équipe et rotation du lead
 
-| N° | Membre | Lead avant la séance |
-|---|---|---|
-| M1 | SOUILAH Meryem | 2 et 7 |
-| M2 | MANYANI Hiba | 3 |
-| M3 | ZOUHRI Imane | 4 |
-| M4 | BELMOKHTARE Fatima Ezzahra | 5 |
-| M5 | GUEROUANE Imane | 6 |
+
+
