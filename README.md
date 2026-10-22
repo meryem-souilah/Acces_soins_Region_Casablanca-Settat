@@ -60,7 +60,7 @@ Sans conda : `pip install -r requirements.txt` (Python ≥ 3.10).
 | Phase | Séance | Statut |
 |---|---|---|
 | 0. Choix du thème et audit des sources | Séance 2 | 🟡 Réaliser |
-| 1. Collecte (script reproductible) | Séance 3 | ⚪ À venir |
+| 1. Collecte (script reproductible) | Séance 3 | 🟡 Réaliser |
 | 2. Pré-traitement et géodatabase PostGIS | Séance 4 | ⚪ À venir |
 | 3. Traitement et Geo-AI | Séance 5 | ⚪ À venir |
 | 4. Contrôle qualité | Séance 6 | ⚪ À venir |
