@@ -1,56 +1,92 @@
-# SOURCES.md — Inventaire des sources de données
+# SOURCES.md — Inventaire des sources
 
-Toutes les données sont téléchargées dans `donnees_brutes/` (non versionné sur
-GitHub en raison de leur taille). Les preuves d'accès (captures des pages de
-téléchargement et de QGIS) sont dans `preuves/captures/`, et deux échantillons
-réels sont versionnés dans `preuves/`.
+Généré par `scripts/collecte.py` à partir de `donnees_brutes/manifest.json` : ne pas modifier à la main. Les empreintes SHA-256 des fichiers sont dans `donnees_brutes/README.md`.
 
-> Dates au format AAAA-MM-JJ. Mettre à jour la date si une source est
-> retéléchargée.
+- **Zone d'étude** : région Casablanca-Settat (code géographique HCP 06), contour = union des communes, 20 207 km²
+- **CRS de toutes les couches produites** : EPSG:26191 (Merchich / Nord Maroc, en mètres)
+- **Emprise** : rectangle englobant de chaque couche produite, mesuré sur le fichier (xmin, ymin, xmax, ymax)
+- **Dernière collecte** : 2026-10-22T15:03:48Z
+- **Rejouer** : `python scripts/collecte.py` puis `python scripts/controle_collecte.py`
 
-| # | Donnée | Producteur / diffuseur | Lien de téléchargement | Fichier | Format | CRS d'origine | Licence | Date de téléchargement | Dossier local |
-|---|---|---|---|---|---|---|---|---|---|
-| 1 | Établissements de santé (`amenity=hospital/clinic/doctors/dentist/pharmacy`, `healthcare=*`) | Contributeurs OpenStreetMap | [overpass-turbo.eu](https://overpass-turbo.eu), requête `preuves/osm_requete.overpassql` | `osm_sante.geojson` | GeoJSON | EPSG:4326 | ODbL 1.0 | 2026-10-15 | `donnees_brutes/osm_sante/` |
-| 2 | Réseau routier | Contributeurs OpenStreetMap, extrait Geofabrik | [download.geofabrik.de/africa/morocco.html](https://download.geofabrik.de/africa/morocco.html) | `morocco-latest-free.shp.zip` → `gis_osm_roads_free_1.*` | Shapefile | EPSG:4326 | ODbL 1.0 | 2026-10-15 | `donnees_brutes/osm_routes/` |
-| 3 | Population maillée 100 m, 2020, *constrained* | WorldPop (Univ. of Southampton) | [mar_ppp_2020_constrained.tif](https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/MAR/mar_ppp_2020_constrained.tif) | `mar_ppp_2020_constrained.tif` | GeoTIFF | EPSG:4326 | CC BY 4.0 | 2026-10-15 | `donnees_brutes/worldpop/` |
-| 4 | Limites administratives niveaux 0 à 4 (communes = adm3) | HCP, redistribué par OCHA (COD-AB) | [data.humdata.org — Morocco Subnational Administrative Boundaries](https://data.humdata.org/dataset/morocco-administrative-boundaries-populated-places) | `mar_admbnda_hcp_20230925_SHP.zip` | Shapefile | EPSG:4326 (à confirmer dans QGIS) | CC BY for Intergovernmental Organisations | 2026-10-15 | `donnees_brutes/limites_hcp/` |
-| 5 | Population légale RGPH 2024 par commune | Haut-Commissariat au Plan | [hcp.ma — Population légale par régions, provinces et communes](https://www.hcp.ma/Population-legale-du-Royaume-du-Maroc-repartie-par-regions-provinces-et-prefectures-et-communes-selon-les-resultats-du_a3974.html) | PDF de la population légale | PDF (tableaux) | sans objet | Publication officielle, réutilisation avec citation de la source | 2026-10-15 | `donnees_brutes/rgph2024/` |
+## Synthèse
 
-## Détails par source
+| # | Donnée | Producteur | Licence | Millésime | Téléchargée le | CRS origine → produit | Emprise (km) | Volume |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | Limites administratives — communes (admin_level 8) et contour régional | Contributeurs OpenStreetMap (codes géographiques HCP : ref:MA:HCP) | ODbL 1.0 — © contributeurs OpenStreetMap (codes communaux HCP) | OSM au 2026-07-28 | 2026-10-21 | EPSG:4326 → EPSG:26191 | 216 × 168 | 153 communes, 9 provinces/préfectures |
+| 2 | Établissements de santé (hôpitaux, cliniques, médecins, dentistes, pharmacies) | Contributeurs OpenStreetMap | ODbL 1.0 — © contributeurs OpenStreetMap | OSM au 2026-07-24 | 2026-10-21 | EPSG:4326 → EPSG:26191 | 182 × 156 | 1 588 établissements |
+| 3 | Réseau routier circulable (niveau « complet ») | Contributeurs OpenStreetMap, extrait Geofabrik | ODbL 1.0 — © contributeurs OpenStreetMap | OSM au 2026-10-14 | 2026-10-15 | EPSG:4326 → EPSG:26191 | 213 × 166 | 130 813 tronçons, 53 890 km |
+| 4 | Population maillée 100 m, 2020, version « constrained » | WorldPop (University of Southampton) | CC BY 4.0 — WorldPop (Univ. of Southampton) | 2020 (estimation modélisée WorldPop) | 2026-10-15 | EPSG:4326 → EPSG:26191 (copie EPSG:4326 conservée) | 219 × 175 | 7 466 216 hab. (pixels de 100 m) |
+| 5 | Population légale RGPH 2024 (régions, provinces, communes) | Haut-Commissariat au Plan (HCP) | HCP — publication officielle, réutilisation avec citation de la source | RGPH 2024 (population au 1er septembre 2024, décret n° 2.24.1009) | 2026-10-21 | sans objet (tableau) → sans objet | région (tableau) | 255 lignes, dont 153 communes |
 
-**1. Établissements de santé (OSM).** Échantillon réel versionné :
-`preuves/osm_sante_echantillon.geojson` (2 360 entités : 1 971 pharmacies,
-126 hôpitaux, 77 cliniques, 77 cabinets médicaux, 62 dentistes, autres).
-Date des données OSM la plus récente : 2026-07-24. 6,3 % des entités n'ont pas
-de nom.
+## Détail par source
 
-**2. Réseau routier (Geofabrik).** Extrait OSM de tout le Maroc mis à jour
-quotidiennement (données au 2026-10-14). Seule la couche `gis_osm_roads_free_1`
-est utilisée. Choisi à la place de l'API Overpass, saturée lors de nos tests
-(erreur 502).
+### 1. Limites administratives — communes (admin_level 8) et contour régional
 
-**3. WorldPop.** Résolution 0,000833° (environ 100 m). Échantillon découpé sur
-l'emprise versionné : `preuves/worldpop_casablanca_settat.tif`.
+- **URL** : https://overpass.kumi.systems/api/interpreter
+- **Mode d'acquisition** : automatique (API Overpass) — cache local réutilisé
+- **Producteur** : Contributeurs OpenStreetMap (codes géographiques HCP : ref:MA:HCP)
+- **Licence** : ODbL 1.0 — © contributeurs OpenStreetMap (codes communaux HCP)
+- **Millésime des données** : OSM au 2026-07-28
+- **Téléchargée le** : 2026-10-21T21:09:56Z — **collectée le** : 2026-10-22T14:45:36Z
+- **CRS** : origine EPSG:4326 → produit EPSG:26191
+- **Emprise** : EPSG:26191 : 156 993, 192 915, 373 437, 360 575 m — EPSG:4326 : -9.1041, 32.2775, -6.7429, 33.8363 (ouest, sud, est, nord)
+- **Volume** : 153 communes, 9 provinces/préfectures
+- **Sélection** : donnees_brutes/limites/requete_communes.overpassql
+- **Fichiers produits** : `donnees_brutes/limites/limites_casablanca_settat.gpkg`
+- **Remarque** : Le jeu COD-AB d'OCHA/HDX pour le Maroc s'arrête aux provinces (admin2) : les communes viennent d'OSM, jointes au HCP par leur code.
 
-**4. Limites administratives.** Version du 2023-09-25. Le polygone de la région
-Casablanca-Settat (niveau adm1) sert au découpage de toutes les autres couches.
+### 2. Établissements de santé (hôpitaux, cliniques, médecins, dentistes, pharmacies)
 
-**5. RGPH 2024.** Les tableaux du PDF seront extraits et joints aux communes de
-la source 4 (jointure par nom ou code de commune, à vérifier).
+- **URL** : https://overpass.kumi.systems/api/interpreter
+- **Mode d'acquisition** : automatique (API Overpass) — cache local réutilisé
+- **Producteur** : Contributeurs OpenStreetMap
+- **Licence** : ODbL 1.0 — © contributeurs OpenStreetMap
+- **Millésime des données** : OSM au 2026-07-24
+- **Téléchargée le** : 2026-10-21T21:11:20Z — **collectée le** : 2026-10-22T14:45:36Z
+- **CRS** : origine EPSG:4326 → produit EPSG:26191
+- **Emprise** : EPSG:26191 : 158 964, 202 151, 341 165, 358 132 m — EPSG:4326 : -9.0819, 32.3614, -7.0873, 33.8099 (ouest, sud, est, nord)
+- **Volume** : 1 588 établissements
+- **Sélection** : donnees_brutes/osm_sante/requete.overpassql
+- **Fichiers produits** : `donnees_brutes/osm_sante/etablissements_sante.gpkg`
 
-## Emprise
+### 3. Réseau routier circulable (niveau « complet »)
 
-Région Casablanca-Settat. Les données sont d'abord sélectionnées sur le
-rectangle englobant `sud 31.90, ouest -9.40, nord 33.95, est -6.40` (WGS84),
-puis découpées par le polygone régional issu de la source 4.
+- **URL** : https://download.geofabrik.de/africa/morocco-latest-free.shp.zip
+- **Mode d'acquisition** : automatique (extrait Geofabrik) — cache local réutilisé
+- **Producteur** : Contributeurs OpenStreetMap, extrait Geofabrik
+- **Licence** : ODbL 1.0 — © contributeurs OpenStreetMap
+- **Millésime des données** : OSM au 2026-10-14
+- **Téléchargée le** : 2026-10-15T20:45:36Z — **collectée le** : 2026-10-22T15:03:48Z
+- **CRS** : origine EPSG:4326 → produit EPSG:26191
+- **Emprise** : EPSG:26191 : 157 566, 194 144, 371 005, 360 274 m — EPSG:4326 : -9.0978, 32.2888, -6.7689, 33.8332 (ouest, sud, est, nord)
+- **Volume** : 130 813 tronçons, 53 890 km
+- **Sélection** : fclass ∈ motorway, motorway_link, trunk, trunk_link, primary, primary_link, secondary, secondary_link, tertiary, tertiary_link, unclassified, residential, living_street, service, track, track_grade1, track_grade2, track_grade3, track_grade4, track_grade5
+- **Fichiers produits** : `donnees_brutes/osm_routes/routes_casablanca_settat.gpkg`
+- **Remarque** : Tronçons découpés au contour régional, non topologisés : le graphe (nœuds aux intersections, ponts et tunnels via « layer ») se construit au pré-traitement (intersession 3).
 
-CRS de calcul (distances, surfaces) : **EPSG:26191** (Merchich / Nord Maroc).
+### 4. Population maillée 100 m, 2020, version « constrained »
 
-## Limites connues
+- **URL** : https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/MAR/mar_ppp_2020_constrained.tif
+- **Mode d'acquisition** : automatique — cache local réutilisé
+- **Producteur** : WorldPop (University of Southampton)
+- **Licence** : CC BY 4.0 — WorldPop (Univ. of Southampton)
+- **Millésime des données** : 2020 (estimation modélisée WorldPop)
+- **Téléchargée le** : 2026-10-15T17:56:54Z — **collectée le** : 2026-10-22T14:45:38Z
+- **CRS** : origine EPSG:4326 → produit EPSG:26191 (copie EPSG:4326 conservée)
+- **Emprise** : EPSG:26191 : 155 314, 189 922, 373 914, 365 222 m — EPSG:4326 : -9.124, 32.25, -6.7374, 33.8782 (ouest, sud, est, nord)
+- **Volume** : 7 466 216 hab. (pixels de 100 m)
+- **Fichiers produits** : `donnees_brutes/worldpop/worldpop_2020_casablanca_settat_4326.tif`, `donnees_brutes/worldpop/worldpop_2020_casablanca_settat_26191.tif`
 
-- **Décalage temporel** : WorldPop date de 2020, le RGPH de 2024. Les effectifs
-  RGPH 2024 serviront à recaler la population WorldPop par commune.
-- **Complétude d'OSM** : forte proportion de pharmacies par rapport aux
-  hôpitaux ; la couverture des établissements publics reste à vérifier.
-- **Emprise** : le rectangle englobant déborde de la région ; le découpage par
-  le polygone HCP est indispensable avant tout calcul.
+### 5. Population légale RGPH 2024 (régions, provinces, communes)
+
+- **URL** : https://www.hcp.ma/file/242342/
+- **Mode d'acquisition** : automatique — cache local réutilisé
+- **Producteur** : Haut-Commissariat au Plan (HCP)
+- **Licence** : HCP — publication officielle, réutilisation avec citation de la source
+- **Millésime des données** : RGPH 2024 (population au 1er septembre 2024, décret n° 2.24.1009)
+- **Téléchargée le** : 2026-10-21T21:11:25Z — **collectée le** : 2026-10-22T14:45:55Z
+- **CRS** : origine sans objet (tableau) → produit sans objet
+- **Emprise** : tableau sans géométrie, limité à la région (codes 06…) ; il prend l'emprise des communes par jointure sur le code géographique
+- **Volume** : 255 lignes, dont 153 communes
+- **Fichiers produits** : `donnees_brutes/hcp/pages_region_casablanca_settat.txt`, `donnees_brutes/hcp/tableaux_bruts_region.csv`
+- **Remarque** : Import brut (nombres au format texte « 1,234 ») : la conversion et la jointure aux communes relèvent du pré-traitement (intersession 3).

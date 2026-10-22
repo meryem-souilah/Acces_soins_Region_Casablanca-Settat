@@ -1,5 +1,22 @@
-donnees_brutes/
+# Données : on versionne la structure et la provenance, pas les fichiers lourds
+# (limite GitHub 100 Mo). Ils se régénèrent avec scripts/collecte.py et leur
+# SHA-256 est consigné dans donnees_brutes/manifest.json.
+donnees_brutes/**
+!donnees_brutes/**/
+!donnees_brutes/README.md
+!donnees_brutes/manifest.json
+!donnees_brutes/osm_sante/requete.overpassql
+!donnees_brutes/limites/requete_communes.overpassql
+!donnees_brutes/hcp/tableaux_bruts_region.csv
+
+# Caches de requêtes (osmnx, Overpass)
+cache/
+
+# Python / Jupyter
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+*.part
+
+# Secrets
 .env
