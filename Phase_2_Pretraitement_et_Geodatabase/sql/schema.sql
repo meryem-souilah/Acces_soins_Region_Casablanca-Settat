@@ -1,11 +1,4 @@
--- ============================================================================
--- schema.sql — Géodatabase « Accès aux soins, région Casablanca-Settat »
--- Traduction du MLD (modele_acces_soins.drawio, page 2)
---
--- Exécution :  psql -U postgres -d acces_soins -f sql/schema.sql
--- Le fichier est rejouable : il supprime puis recrée le schéma « sante ».
--- Toutes les géométries sont en EPSG:26191 (Merchich / Nord Maroc, mètres).
--- ============================================================================
+
 
 CREATE EXTENSION IF NOT EXISTS postgis;
 
@@ -17,7 +10,6 @@ SET search_path = sante, public;
 -- 1. Tables de référence et tables mères
 -- ----------------------------------------------------------------------------
 
--- Rôle : décision. Échelle des délégations provinciales de santé (9 provinces/préfectures).
 CREATE TABLE province (
     code_province  varchar(10)  PRIMARY KEY,
     nom            varchar(100) NOT NULL,
@@ -27,16 +19,13 @@ CREATE TABLE province (
     CONSTRAINT province_geom_valide CHECK (ST_IsValid(geom))
 );
 
--- Rôle : offre — référentiel de l'analyse.
--- La question est « où ajouter QUEL TYPE d'offre » : chaque niveau de soin a son
--- propre seuil d'accès et sa population cible. Ces paramètres vivent ici, pas
--- dans le code, pour être traçables et modifiables sans relancer de développement.
+
 CREATE TABLE niveau_soin (
-    code_niveau         smallint    PRIMARY KEY,   -- 1 = proximité, 2 = référence, 3 = régional/CHU
+    code_niveau         smallint    PRIMARY KEY,   
     libelle             varchar(80) NOT NULL,
-    seuil_acces_min     smallint,                  -- NULL tant qu'aucune norme n'est sourcée
-    pop_cible_par_etab  integer,                   -- idem
-    source_norme        text,                      -- d'où viennent les deux valeurs ci-dessus
+    seuil_acces_min     smallint,                  
+    pop_cible_par_etab  integer,                   
+    source_norme        text,                      
     -- Règle de couverture portée par la donnée : false = couverture STRICTE,
     -- un établissement ne couvre que son propre niveau (un CHU ne couvre pas le
     -- niveau 1). Passer à true sert de scénario de comparaison.
@@ -189,12 +178,7 @@ INSERT INTO niveau_soin (code_niveau, libelle, seuil_acces_min, pop_cible_par_et
     (2, 'Hôpital de référence (provincial / préfectoral)', 30, 150000, 'Scénario carte sanitaire (CHP / clinique de 2e recours, 30 min)', false),
     (3, 'Hôpital régional ou CHU',                     60, 1000000, 'Scénario carte sanitaire (CHR / CHU de 3e recours, 60 min)', false);
 
--- Niveau PAR DÉFAUT de chaque type. Les hôpitaux régionaux / CHU sont distingués
--- à la relecture (CHU Ibn Rochd, Hôpital Mohammed V, etc. → niveau 3, niveau_source = 'relecture').
--- Justification dentistes/pharmacies/autre (inclus_analyse = false) : ce ne sont pas des
--- structures de soins médicaux polyvalents de premier ou second recours au sens de l'étude,
--- mais ils sont conservés en base pour la traçabilité vis-à-vis de la source OSM et pour
--- permettre des analyses complémentaires sans réimporter.
+
 INSERT INTO type_etablissement (code_type, libelle, tags_osm, inclus_analyse, niveau_defaut) VALUES
     ('hopital',      'Hôpital',                                      'amenity=hospital ; healthcare=hospital',      true,  2),
     ('clinique',     'Clinique',                                     'amenity=clinic ; healthcare=clinic',          true,  2),
@@ -218,15 +202,4 @@ COMMENT ON TABLE troncon            IS 'Tronçons orientés du réseau routier r
 COMMENT ON COLUMN etablissement.niveau_source IS 'defaut_type = niveau du type ; relecture = corrigé à la main';
 COMMENT ON COLUMN niveau_soin.seuil_acces_min IS 'Temps d''accès cible en minutes — associé à source_norme';
 
--- ============================================================================
--- DÉMO SÉANCE 4 — la clé étrangère rejette une insertion invalide
--- À lancer à la main, une fois la base peuplée (ne pas décommenter ici) :
---
---   INSERT INTO sante.etablissement (osm_id, code_type, code_niveau, code_hcp, geom)
---   VALUES ('test/1', 'hopital', 2, 'CODE_INEXISTANT',
---           ST_SetSRID(ST_MakePoint(300000, 330000), 26191));
---
---   Résultat attendu :
---   ERROR: insert or update on table "etablissement" violates foreign key
---          constraint "etablissement_code_hcp_fkey"
--- ============================================================================
+
