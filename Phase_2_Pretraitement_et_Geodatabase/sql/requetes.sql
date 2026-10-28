@@ -1,21 +1,11 @@
--- ============================================================================
--- requetes.sql — Trois requêtes spatiales métier pour la séance 4 & la séance 5
--- Projet : Accès aux soins dans la région Casablanca-Settat (EPSG:26191)
---
--- Exécution :
---   psql -h 127.0.0.1 -U postgres -d acces_soins -f sql/requetes.sql
---
--- Chaque requête est accompagnée de son commentaire métier et d'une analyse
--- de son plan d'exécution (EXPLAIN ANALYZE) démontrant l'utilisation des
--- index spatiaux GIST et des index B-tree sur clés étrangères.
--- ============================================================================
+
 
 SET search_path = sante, public;
 
 -- ============================================================================
 -- REQUÊTE 1 : Diagnostic territorial de l'offre de soins par commune et niveau
 -- ----------------------------------------------------------------------------
--- Objectif métier (préparation Séance 5) :
+-- Objectif métier  :
 --   Croiser la demande officielle (population RGPH 2024 des 153 communes) avec
 --   l'offre de soins active (inclus_analyse = true) ventilée par niveau de la
 --   filière (niveau 1 : proximité, niveau 2 : référence provinciale, niveau 3 :
@@ -48,7 +38,7 @@ ORDER BY
     c.pop_2024 DESC NULLS LAST
 LIMIT 20;
 
--- Plan d'exécution de la Requête 1 (vérifie l'index spatial GIST sur ST_Within) :
+-- Plan d'exécution de la Requête 1 
 EXPLAIN (ANALYZE, BUFFERS)
 SELECT
     p.nom AS province,
@@ -74,8 +64,7 @@ LIMIT 20;
 --   Pour chaque hexagone H3 peuplé (maille_h3), rechercher par plus proche voisin
 --   spatial (CROSS JOIN LATERAL + ORDER BY m.geom <-> e.geom LIMIT 1) l'établissement
 --   de soins actif (inclus_analyse = true) le plus proche et calculer la distance
---   en kilomètres ainsi qu'un temps théorique à vol d'oiseau (baseline pour la
---   séance 5 avant comparaison au temps réel sur le graphe routier et au modèle IA).
+--   en kilomètres ainsi qu'un temps théorique à vol d'oiseau .
 -- ============================================================================
 
 WITH distance_maille AS (
@@ -139,7 +128,7 @@ LIMIT 20;
 -- REQUÊTE 3 : Connectivité routière des établissements et coût des tronçons
 --             dans un rayon de desserte (ST_DWithin + graphe noeud/troncon)
 -- ----------------------------------------------------------------------------
--- Objectif métier (préparation Séance 5) :
+-- Objectif métier  :
 --   Vérifier la qualité de l'accrochage des établissements de niveau 2 et 3
 --   (hôpitaux et cliniques) au graphe routier (table noeud) et évaluer la densité
 --   ainsi que le temps de parcours élémentaire (en minutes) des tronçons routiers
