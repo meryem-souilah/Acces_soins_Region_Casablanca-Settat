@@ -1,21 +1,3 @@
-# Phase 0 — Cadrage du projet et audit des sources (Séance 2)
-
-## 📂 Fichiers et preuves de ce dossier
-
-| Fichier | Description |
-|---|---|
-| [README_CADRAGE.md](README_CADRAGE.md) | Document de cadrage complet de la Séance 2 (reproduit ci-dessous) |
-| [GUIDE_INSTALLATION.md](GUIDE_INSTALLATION.md) | Guide d'installation de l'environnement et protocole de test d'accès |
-| [SOURCES.md](SOURCES.md) | Inventaire détaillé des 5 sources retenues |
-| [scripts/00_test_acces.py](scripts/00_test_acces.py) | Script initial de preuve d'accès aux 5 sources (Go/No-Go) |
-| [scripts/01_demo_carte.py](scripts/01_demo_carte.py) | Script de génération de la première carte de démonstration |
-| [preuves/rapport_acces_initial.md](preuves/rapport_acces_initial.md) | Rapport d'exécution du premier test d'accès |
-| [preuves/osm_sante_echantillon.geojson](preuves/osm_sante_echantillon.geojson) | Échantillon initial d'établissements de santé OSM (EPSG:4326) |
-| [preuves/worldpop_casablanca_settat.tif](preuves/worldpop_casablanca_settat.tif) | Extrait raster WorldPop 100 m sur l'emprise |
-| [preuves/capture_exploration_initiale.png](preuves/capture_exploration_initiale.png) | Capture d'exploration visuelle initiale |
-
----
-
 # Cadrage du projet — README
 
 Projet **Géodata appliquée** · Accès aux soins, région Casablanca-Settat

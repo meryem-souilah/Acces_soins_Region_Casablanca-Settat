@@ -26,10 +26,9 @@ for _var, _sous in (("PROJ_DATA", ("Library", "share", "proj")),
     elif not str(Path(os.environ.get(_var, _prefixe))).lower().startswith(_prefixe.lower()):
         del os.environ[_var]
 
-# ── Racine du projet (dossier parent de scripts/ ou de Phase_*/scripts/) ─────
-_parent = Path(__file__).resolve().parent.parent
-RACINE = _parent.parent if _parent.name.startswith("Phase_") else _parent
-DONNEES_BRUTES = RACINE / "donnees_brutes"
+# ── Racine de la Phase 2 et lien vers donnees_brutes de la Phase 1 ───────────
+RACINE = Path(__file__).resolve().parent.parent
+DONNEES_BRUTES = RACINE.parent / "Phase_1_Acquisition_et_Collecte" / "donnees_brutes"
 PREUVES = RACINE / "preuves"
 
 # ── Emprise d'étude ──────────────────────────────────────────────────────────

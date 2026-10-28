@@ -1,25 +1,27 @@
-# Données brutes : on versionne la structure, la provenance et les couches légères (< 2 Mo),
+# Données brutes de la Phase 1 : on versionne la structure, la provenance et les couches légères (< 2 Mo),
 # mais pas l'archive routière Geofabrik lourde (> 100 Mo, limite GitHub).
-donnees_brutes/**
-!donnees_brutes/**/
-!donnees_brutes/README.md
-!donnees_brutes/manifest.json
-!donnees_brutes/osm_sante/requete.overpassql
-!donnees_brutes/osm_sante/etablissements_sante.gpkg
-!donnees_brutes/limites/requete_communes.overpassql
-!donnees_brutes/limites/limites_casablanca_settat.gpkg
-!donnees_brutes/worldpop/worldpop_2020_casablanca_settat_26191.tif
-!donnees_brutes/hcp/tableaux_bruts_region.csv
+Phase_1_Acquisition_et_Collecte/donnees_brutes/**
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/**/
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/README.md
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/manifest.json
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/osm_sante/requete.overpassql
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/osm_sante/etablissements_sante.gpkg
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/limites/requete_communes.overpassql
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/limites/limites_casablanca_settat.gpkg
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/worldpop/worldpop_2020_casablanca_settat_26191.tif
+!Phase_1_Acquisition_et_Collecte/donnees_brutes/hcp/tableaux_bruts_region.csv
 
-# Données traitées : le GeoPackage complet avec les 318 229 tronçons routiers (115 Mo)
+# Données traitées de la Phase 2 : le GeoPackage complet avec les 318 229 tronçons routiers (115 Mo)
 # dépasse la limite GitHub de 100 Mo ; on versionne le GeoPackage léger (8 Mo)
-# ainsi que le dump PostGIS complet compressé sql/acces_soins.backup (42 Mo).
-donnees_traitees/sante_nettoyee.gpkg
-donnees_traitees/*.gpkg-shm
-donnees_traitees/*.gpkg-wal
+# ainsi que le dump PostGIS complet compressé Phase_2_Pretraitement_et_Geodatabase/sql/acces_soins.backup (42 Mo).
+Phase_2_Pretraitement_et_Geodatabase/donnees_traitees/sante_nettoyee.gpkg
+Phase_2_Pretraitement_et_Geodatabase/donnees_traitees/*.gpkg-shm
+Phase_2_Pretraitement_et_Geodatabase/donnees_traitees/*.gpkg-wal
 
-# Caches de requêtes (osmnx, Overpass)
+# Caches et présentations (conservées uniquement en local hors du dépôt)
 cache/
+**/presentation/
+sauvegarde_sources/
 
 # Python / Jupyter / OS
 __pycache__/
@@ -27,10 +29,4 @@ __pycache__/
 .ipynb_checkpoints/
 *.part
 desktop.ini
-
-# Secrets
 .env
-
-# Archives des sources brutes (publiées en Release GitHub, trop lourdes pour le dépôt)
-sauvegarde_sources/
-presentation/*.zip

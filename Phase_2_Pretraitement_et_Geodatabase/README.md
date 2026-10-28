@@ -1,25 +1,3 @@
-# Phase 2 — Pré-traitement, nettoyage topologique et géodatabase PostGIS (Séance 4)
-
-## 📂 Fichiers et preuves de ce dossier
-
-| Fichier | Description |
-|---|---|
-| [README_PRETRAITEMENT.md](README_PRETRAITEMENT.md) | Documentation complète de la phase de pré-traitement et PostGIS (reproduite ci-dessous) |
-| [presentation/seance4_pretraitement.pdf](presentation/seance4_pretraitement.pdf) | Support de présentation de la Séance 4 (12 diapositives 16:9, PDF + source [.tex](presentation/seance4_pretraitement.tex)) |
-| [modelisation_mcd_mld/modele_acces_soins.drawio](modelisation_mcd_mld/modele_acces_soins.drawio) | Modèle MCD / MLD complet éditable dans draw.io + [Avancement_projet_MCD_MLD.pdf](modelisation_mcd_mld/Avancement_projet_MCD_MLD.pdf) |
-| [sql/schema.sql](sql/schema.sql) | DDL complet du schéma PostGIS sante (8 tables, 10 FK, contraintes CHECK, 6 index GIST, 9 index B-tree) |
-| [sql/requetes.sql](sql/requetes.sql) | 3 requêtes spatiales métier commentées avec EXPLAIN (ANALYZE, BUFFERS) |
-| [../sql/acces_soins.backup](../sql/acces_soins.backup) | Dump PostGIS complet restaurable (pg_dump -Fc, 42,13 Mo, testé avec pg_restore) |
-| [scripts/nettoyage.py](scripts/nettoyage.py) | Script de nettoyage v2 avec mode --dry-run, déduplication OSM, graphe routier topologique et H3 rés. 8 |
-| [scripts/import_postgis.py](scripts/import_postgis.py) | Script d'import ogr2ogr → staging → sante, tests de rejet par contraintes, exécution de 
-equetes.sql et pg_dump |
-| [preuves/rapport_nettoyage.md](preuves/rapport_nettoyage.md) | Rapport quantitatif avant / après nettoyage |
-| [preuves/carte_nettoyage.png](preuves/carte_nettoyage.png) | Planche visuelle comparative avant / après nettoyage |
-| [preuves/resultats_requetes_seance4.md](preuves/resultats_requetes_seance4.md) | Sorties des 3 requêtes métier, plans EXPLAIN ANALYZE et preuves de rejet d'insertions invalides |
-| [../donnees_traitees/sante_nettoyee_couches_legeres.gpkg](../donnees_traitees/sante_nettoyee_couches_legeres.gpkg) | GeoPackage nettoyé en EPSG:26191 (province, commune, etablissement, maille_h3) |
-
----
-
 # Phase de pré-traitement et géodatabase PostGIS — README
 
 Projet **Géodata appliquée** · Accès aux soins, région Casablanca-Settat
@@ -154,10 +132,3 @@ pg_restore -U postgres -d acces_soins --no-owner --no-privileges sql/acces_soins
 | **1** | **Jointure spatiale** : quelle est l'offre de soins par niveau et le ratio pour 10 000 hab. dans chaque province et commune ? | `ST_Contains(c.geom, e.geom)` | `Nested Loop` + **`Index Scan using etablissement_geom_gist`** (656 buffers lus en mémoire, 0 lecture disque) | **26,3 ms** | **79 communes sur 153** (soit **878 242 hab.**, 11,4 % de la population régionale) ne comptent **aucun établissement** recensé dans OSM. |
 | **2** | **Plus proche voisin (KNN)** : quelle population réside à plus de 5 km, 10 km ou 15 km du centre de soins de base le plus proche ? | `CROSS JOIN LATERAL` avec opérateur KNN `e.geom <-> m.geom` | **`Index Scan using etablissement_geom_gist`** ordonné par distance pour chacune des 25 255 mailles H3 (sans produit cartésien 25 255 × 468) | **192,4 ms** | **1 088 866 habitants** (14,6 % de la région) vivent à **plus de 5 km** à vol d'oiseau d'un centre de soins de base (maximum : 26,6 km à Benslimane). |
 | **3** | **Agrégation spatiale** : quelle est la densité et la carrossabilité du réseau routier dans un rayon de 1 km autour des hôpitaux et cliniques ? | `ST_DWithin(e.geom, t.geom, 1000.0)` | **`Bitmap Index Scan on troncon_geom_gist`** sur les 318 229 tronçons | **295,6 ms** | **319 hôpitaux et cliniques** analysés ; 98 à 100 % des voies riveraines sont carrossables à Casablanca/Mohammedia, contre 92,7 % à El Jadida. |
-
-
----
-
-## 7. Planche cartographique de contrôle du nettoyage (EPSG:26191)
-
-![Carte avant/après nettoyage](preuves/carte_nettoyage.png)

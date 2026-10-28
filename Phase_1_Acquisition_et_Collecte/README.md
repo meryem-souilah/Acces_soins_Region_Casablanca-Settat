@@ -1,22 +1,3 @@
-# Phase 1 — Acquisition et collecte reproductible des données (Séance 3)
-
-## 📂 Fichiers et preuves de ce dossier
-
-| Fichier | Description |
-|---|---|
-| [README_COLLECTE.md](README_COLLECTE.md) | Documentation complète de la phase de collecte (reproduite ci-dessous) |
-| [presentation/seance3_acquisition.pdf](presentation/seance3_acquisition.pdf) | Support de présentation de la Séance 3 (PDF + source [.tex](presentation/seance3_acquisition.tex)) |
-| [scripts/collecte.py](scripts/collecte.py) | Pipeline de collecte multi-sources reproductible (EPSG:26191) |
-| [scripts/controle_collecte.py](scripts/controle_collecte.py) | Contrôle automatique CRS, emprise, géométries et jointure HCP (153/153) |
-| [scripts/creer_projet_qgis.py](scripts/creer_projet_qgis.py) | Génération automatique du projet QGIS [preuves/verification_couches_26191.qgz](preuves/verification_couches_26191.qgz) |
-| [donnees_brutes_provenance/manifest.json](donnees_brutes_provenance/manifest.json) | Manifeste de provenance avec empreintes SHA-256 et métadonnées |
-| [donnees_brutes_provenance/tableaux_bruts_region.csv](donnees_brutes_provenance/tableaux_bruts_region.csv) | Population légale RGPH 2024 extraite du PDF HCP (153 communes, 7 688 967 hab.) |
-| [preuves/controle_collecte.md](preuves/controle_collecte.md) | Rapport de validation automatique des 5 sources en EPSG:26191 |
-| [preuves/carte_controle.png](preuves/carte_controle.png) | Planche de contrôle des 4 couches spatiales + [capture_qgis_couches_26191.png](preuves/capture_qgis_couches_26191.png) |
-| [uml/](uml/) | 6 diagrammes d'architecture UML PlantUML (.puml + .png) |
-
----
-
 # Phase de collecte des données — README
 
 Projet **Géodata appliquée** · Accès aux soins, région Casablanca-Settat
@@ -306,17 +287,3 @@ Points à vérifier dans le contrôle :
 | `KeyError: maxspeed` | colonne absente des données osmnx | corrigé : seules les colonnes présentes sont gardées |
 | Les corrections ne semblent pas appliquées | anciens scripts toujours en place | vérifier avec `findstr "PROJ_DATA" scripts\config.py` ; remplacer les fichiers du dossier `scripts\` |
 
-
-
----
-
-## 11. Évolution finale du pipeline de collecte (Séance 3 — reproductibilité intégrale)
-
-Suite à l'audit constatant que le jeu COD-AB d'OCHA/HDX pour le Maroc s'arrête au niveau provincial (ADM2) et que le téléchargement routier Overpass par tuiles peut saturer, la version finale de [scripts/collecte.py](scripts/collecte.py) intègre trois améliorations majeures :
-1. **Communes (limites) via OpenStreetMap (dmin_level=8, code 
-ef:MA:HCP)** : récupération des **153 communes** exactes de la région Casablanca-Settat avec leur code officiel HCP permettant une jointure **153 / 153 (100 %)** avec le RGPH 2024 (**7 688 967 habitants**).
-2. **Réseau routier (
-outes) via l'extrait national Geofabrik** (gis_osm_roads_free_1.shp) découpé sur le polygone régional : **130 783 tronçons** (**53 907 km** de voirie) extraits en moins de 90 secondes sans dépendre des quotas Overpass.
-3. **Archivage et restauration hors-ligne (--archiver / --depuis-archive)** : garantit la reproductibilité bit-à-bit grâce à la vérification des empreintes SHA-256 consignées dans [manifest.json](donnees_brutes_provenance/manifest.json).
-
-![Carte de contrôle de la collecte](preuves/carte_controle.png)
