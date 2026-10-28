@@ -1,0 +1,66 @@
+@startuml classes_code
+!include style.iuml
+title Structure du code — modules Python et leurs fonctions
+hide empty members
+skinparam linetype ortho
+
+class "config.py" as config <<module>> {
+  + RACINE, DONNEES_BRUTES, PREUVES : Path
+  + BBOX : dict
+  + CRS_GEO = "EPSG:4326"
+  + CRS_METRIQUE = "EPSG:26191"
+  + OVERPASS_URLS, WORLDPOP_URLS : list
+  + CODE_HCP_REGION = "06"
+  + HCP_POP_LEGALE_URL, GEOFABRIK_MAROC : str
+  + ROUTES_FCLASS, ROUTES_FILTRES
+  + LICENCES : dict
+  --
+  correctif PROJ_LIB / PROJ_DATA à l'import
+}
+
+class "collecte.py" as collecte <<module>> {
+  -- utilitaires --
+  + telecharger(urls, dest) : str
+  + requete_overpass(requete, dest) : str
+  + sha256(fichier) : str
+  + info_fichier(fichier) : dict
+  + region_polygone() : GeoDataFrame
+  -- étapes --
+  + etape_limites(force) : dict
+  + etape_sante(force) : dict
+  + etape_routes(force, niveau) : dict
+  + etape_worldpop(force) : dict
+  + etape_hcp(force) : dict
+  -- documentation --
+  + ecrire_documentation(manifeste)
+  + ecrire_sources(manifeste)
+  + emprise(source) : bornes 26191 et 4326
+  -- reproductibilité --
+  + archiver(manifeste) : Path
+  + restaurer(archive)
+  --
+  + main()
+}
+
+class "controle_collecte.py" as controle <<module>> {
+  + COUCHES : list
+  + RASTER, TABLEAU_HCP : Path
+  + epsg(crs) : str
+  + controle_jointure(communes) : (bool, list)
+  + main()
+}
+
+class "manifest.json" as manifest <<fichier>> {
+  projet, crs_cible
+  derniere_collecte
+  sources : {limites, sante, routes, worldpop, hcp}
+  --
+  par source : statut, url, mode, licence,
+  dates, CRS, fichiers + SHA-256, volumes
+}
+
+collecte ..> config : importe
+controle ..> config : importe
+collecte --> manifest : écrit
+controle ..> manifest : lit
+@enduml

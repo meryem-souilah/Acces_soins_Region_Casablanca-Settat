@@ -26,8 +26,9 @@ for _var, _sous in (("PROJ_DATA", ("Library", "share", "proj")),
     elif not str(Path(os.environ.get(_var, _prefixe))).lower().startswith(_prefixe.lower()):
         del os.environ[_var]
 
-# ── Racine du projet (dossier parent de scripts/) ────────────────────────────
-RACINE = Path(__file__).resolve().parent.parent
+# ── Racine du projet (dossier parent de scripts/ ou de Phase_*/scripts/) ─────
+_parent = Path(__file__).resolve().parent.parent
+RACINE = _parent.parent if _parent.name.startswith("Phase_") else _parent
 DONNEES_BRUTES = RACINE / "donnees_brutes"
 PREUVES = RACINE / "preuves"
 
@@ -49,8 +50,8 @@ DEMO_ROUTES_RAYON_M = 3000
 # Ordre d'essai des serveurs Overpass : le serveur principal (overpass-api.de)
 # est souvent saturé (erreur 502), on commence donc par un miroir.
 OVERPASS_URLS = [
-    "https://overpass.kumi.systems/api/interpreter",
     "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
     "https://overpass.private.coffee/api/interpreter",
 ]
 
@@ -89,7 +90,7 @@ ROUTES_FCLASS = [
     "track_grade3", "track_grade4", "track_grade5",
 ]
 
-USER_AGENT = "geodata-ecole-ingenieurs/0.1 (projet pedagogique)"
+USER_AGENT = "AccesSoinsCasablancaSettat/1.0 (https://github.com/meryem-souilah/Acces_soins_Region_Casablanca-Settat)"
 
 # Secours automatique pour le contour régional (OSM via geoBoundaries, ODbL)
 GEOBOUNDARIES_ADM1 = ("https://github.com/wmgeolab/geoBoundaries/raw/9469f09/"

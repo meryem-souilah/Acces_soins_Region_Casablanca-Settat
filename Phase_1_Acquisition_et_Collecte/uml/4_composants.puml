@@ -1,0 +1,52 @@
+@startuml composants
+!include style.iuml
+title Composants — architecture de la phase de collecte
+left to right direction
+skinparam nodesep 25
+skinparam ranksep 70
+
+cloud "Sources ouvertes" as SOURCES {
+  [API Overpass (OSM)] as OVP
+  [Geofabrik (OSM)] as GF
+  [WorldPop] as WP
+  [hcp.ma] as HCP
+}
+
+package "scripts/" {
+  [config.py] as CFG
+  [collecte.py] as COL
+  [controle_collecte.py] as CTL
+}
+
+package "donnees_brutes/" {
+  database "couches EPSG:26191\nlimites · sante · routes\nworldpop · hcp" as COUCHES
+  [manifest.json\nREADME.md] as MAN
+}
+
+package "Livrables" {
+  [SOURCES.md] as SRC
+  [preuves/\nrapport + carte de contrôle] as PRV
+  [preuves/\nprojet QGIS] as QGZ
+}
+
+package "Reproductibilité" {
+  [environment.yml\nrequirements-lock.txt] as ENV
+  [sauvegarde_sources/\nsources_brutes_*.zip\n(Release GitHub)] as ARC
+}
+
+OVP --> COL
+GF --> COL
+WP --> COL
+HCP --> COL
+CFG <.. COL : importe
+COL --> COUCHES
+COL --> MAN
+COL --> SRC
+COUCHES --> CTL
+CTL --> PRV
+COUCHES ..> QGZ
+COL --> ARC : --archiver
+ARC ..> COL : --depuis-archive
+ENV ..> COL : versions figées
+CFG <.. CTL : importe
+@enduml

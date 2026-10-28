@@ -1,121 +1,108 @@
 # Accès aux soins dans la région Casablanca-Settat
 
-Projet du module **Géodata appliquée** — Geo-AI appliqué à un défi spatial
-(élèves ingénieurs 3ᵉ année).
+Projet fil rouge du module **Géodata appliquée** — *Geo-AI appliqué à un défi spatial* (élèves ingénieurs 3ᵉ année).
 
-## Défi spatial
+> **Défi spatial :** *Quelles zones de la région Casablanca-Settat sont mal desservies en établissements de santé, et où faut-il intervenir en priorité ?*
 
-> **Quelles zones de la région Casablanca-Settat sont mal desservies en
-> établissements de santé, et où faut-il intervenir en priorité ?**
+- **Utilisateurs cibles :** Direction régionale de la Santé, Conseil régional Casablanca-Settat, urbanistes et planificateurs des communes.
+- **Emprise d'étude :** Région Casablanca-Settat (code géographique HCP `06`), formée par l'union exacte de ses **153 communes** (**9 provinces**, **19 448 km²**, **7 688 967 habitants** au RGPH 2024).
+- **Système de coordonnées de référence (CRS) :** **`EPSG:26191`** (*Merchich / Nord Maroc*, projection conforme conique de Lambert métrique).
 
-Le projet mesure le temps d'accès par la route de la population aux
-établissements de santé (hôpitaux, cliniques, médecins, pharmacies), identifie
-les zones sous-desservies à l'aide d'un modèle de machine learning, puis
-propose des recommandations priorisées.
+---
 
-**Utilisateurs cibles :** Direction régionale de la Santé, Conseil régional
-Casablanca-Settat, urbanistes et planificateurs des communes.
+## 📂 Navigation rapide par phase du projet
 
-**Emprise :** région Casablanca-Settat (code géographique HCP 06), contour
-formé par l'union de ses 153 communes. **CRS de toutes les couches :** EPSG:26191.
+Le dépôt est organisé **par phase** (selon le découpage des séances du module) afin de faciliter la consultation et l'évaluation de chaque livrable :
 
-## Sources de données
+| Phase | Séance | Dossier dédié | Statut | Principaux livrables contenus dans le dossier |
+|---|---|---|---|---|
+| **Phase 0** — Cadrage & Audit des sources | Séance 2 | [`Phase_0_Cadrage_et_Audit_Sources/`](Phase_0_Cadrage_et_Audit_Sources/) | ✅ Réalisé | [`SOURCES.md`](Phase_0_Cadrage_et_Audit_Sources/SOURCES.md), rapport d'accès initial, requête Overpass, échantillons GeoJSON/GeoTIFF |
+| **Phase 1** — Acquisition & Collecte reproductible | Séance 3 | [`Phase_1_Acquisition_et_Collecte/`](Phase_1_Acquisition_et_Collecte/) | ✅ Réalisé | Présentation [`seance3_acquisition.pdf`](Phase_1_Acquisition_et_Collecte/presentation/seance3_acquisition.pdf), scripts [`collecte.py`](Phase_1_Acquisition_et_Collecte/scripts/collecte.py) & [`controle_collecte.py`](Phase_1_Acquisition_et_Collecte/scripts/controle_collecte.py), [`manifest.json`](Phase_1_Acquisition_et_Collecte/donnees_brutes_provenance/manifest.json) (SHA-256), 6 diagrammes [`uml/`](Phase_1_Acquisition_et_Collecte/uml/), [`carte_controle.png`](Phase_1_Acquisition_et_Collecte/preuves/carte_controle.png), projet QGIS |
+| **Phase 2** — Pré-traitement & Géodatabase PostGIS | Séance 4 | [`Phase_2_Pretraitement_et_Geodatabase/`](Phase_2_Pretraitement_et_Geodatabase/) | ✅ Réalisé | Présentation [`seance4_pretraitement.pdf`](Phase_2_Pretraitement_et_Geodatabase/presentation/seance4_pretraitement.pdf), MCD/MLD [`modele_acces_soins.drawio`](Phase_2_Pretraitement_et_Geodatabase/modelisation_mcd_mld/modele_acces_soins.drawio) & [PDF](Phase_2_Pretraitement_et_Geodatabase/modelisation_mcd_mld/Avancement_projet_MCD_MLD.pdf), DDL [`schema.sql`](Phase_2_Pretraitement_et_Geodatabase/sql/schema.sql), 3 requêtes métier [`requetes.sql`](Phase_2_Pretraitement_et_Geodatabase/sql/requetes.sql) + [`resultats_requetes_seance4.md`](Phase_2_Pretraitement_et_Geodatabase/preuves/resultats_requetes_seance4.md), script [`nettoyage.py`](Phase_2_Pretraitement_et_Geodatabase/scripts/nettoyage.py) (`--dry-run`), [`rapport_nettoyage.md`](Phase_2_Pretraitement_et_Geodatabase/preuves/rapport_nettoyage.md), [`carte_nettoyage.png`](Phase_2_Pretraitement_et_Geodatabase/preuves/carte_nettoyage.png), dump [`acces_soins.backup`](sql/acces_soins.backup) |
+| **Phase 3** — Traitement spatial & Geo-AI | Séance 5 | [`Phase_3_Traitement_et_GeoAI/`](Phase_3_Traitement_et_GeoAI/) | ⚪ À venir | Calcul d'accessibilité routière (Dijkstra), indicateurs par maille H3 et modèle ML |
+| **Phase 4** — Contrôle qualité (ISO 19157) | Séance 6 | [`Phase_4_Controle_Qualite/`](Phase_4_Controle_Qualite/) | ⚪ À venir | Validation croisée spatiale, analyse des biais et contrôle qualité |
+| **Phase 5** — Diffusion & Recommandations | Séance 7 | [`Phase_5_Diffusion_et_Recommandations/`](Phase_5_Diffusion_et_Recommandations/) | ⚪ À venir | Cartographie décisionnelle et priorisation des implantations sanitaires |
 
-| Donnée | Source | Licence |
-|---|---|---|
-| Communes et contour régional | OpenStreetMap (`admin_level=8`, code HCP `ref:MA:HCP`) | ODbL 1.0 |
-| Établissements de santé | OpenStreetMap (API Overpass) | ODbL 1.0 |
-| Réseau routier | OpenStreetMap (extrait Geofabrik) | ODbL 1.0 |
-| Population maillée 100 m (2020) | WorldPop | CC BY 4.0 |
-| Population légale RGPH 2024 | HCP (PDF des tableaux) | citation de la source |
+---
 
-Le jeu COD-AB d'OCHA/HDX pour le Maroc s'arrête aux provinces : les communes
-viennent d'OSM, où chacune porte son code HCP, identique à celui du tableau de
-population légale (153 communes sur 153 appariées).
+## 🗂️ Récapitulatif des livrables par phase complétée
 
-Détail complet (URL, millésime, licence, CRS, emprise, volume) : [`SOURCES.md`](SOURCES.md).
-Provenance et empreintes SHA-256 : [`donnees_brutes/README.md`](donnees_brutes/README.md).
+### 🔹 Phase 0 — Cadrage et audit des sources (Séance 2)
+- **Catalogue des 5 sources** : [`Phase_0_Cadrage_et_Audit_Sources/SOURCES.md`](Phase_0_Cadrage_et_Audit_Sources/SOURCES.md)
+- **Preuves d'accès et échantillons** : [`Phase_0_Cadrage_et_Audit_Sources/preuves/`](Phase_0_Cadrage_et_Audit_Sources/preuves/)
 
-## Installation de l'environnement
+### 🔹 Phase 1 — Acquisition et collecte reproductible (Séance 3)
+- **Support de présentation Séance 3** : [`Phase_1_Acquisition_et_Collecte/presentation/seance3_acquisition.pdf`](Phase_1_Acquisition_et_Collecte/presentation/seance3_acquisition.pdf)
+- **Pipeline de collecte et contrôle CRS (`EPSG:26191`)** : [`Phase_1_Acquisition_et_Collecte/scripts/collecte.py`](Phase_1_Acquisition_et_Collecte/scripts/collecte.py) & [`controle_collecte.py`](Phase_1_Acquisition_et_Collecte/scripts/controle_collecte.py)
+- **Manifeste de provenance (`SHA-256`)** : [`Phase_1_Acquisition_et_Collecte/donnees_brutes_provenance/manifest.json`](Phase_1_Acquisition_et_Collecte/donnees_brutes_provenance/manifest.json)
+- **Rapport et cartes de contrôle** : [`Phase_1_Acquisition_et_Collecte/preuves/controle_collecte.md`](Phase_1_Acquisition_et_Collecte/preuves/controle_collecte.md) & [`carte_controle.png`](Phase_1_Acquisition_et_Collecte/preuves/carte_controle.png)
+- **Diagrammes d'architecture UML (6 diagrammes PlantUML)** : [`Phase_1_Acquisition_et_Collecte/uml/`](Phase_1_Acquisition_et_Collecte/uml/)
 
-Les versions sont figées : celles qui ont produit le jeu de données.
+### 🔹 Phase 2 — Pré-traitement et géodatabase PostGIS (Séance 4)
+- **Support de présentation Séance 4** : [`Phase_2_Pretraitement_et_Geodatabase/presentation/seance4_pretraitement.pdf`](Phase_2_Pretraitement_et_Geodatabase/presentation/seance4_pretraitement.pdf)
+- **Modèle conceptuel et logique (MCD / MLD)** : [`Phase_2_Pretraitement_et_Geodatabase/modelisation_mcd_mld/modele_acces_soins.drawio`](Phase_2_Pretraitement_et_Geodatabase/modelisation_mcd_mld/modele_acces_soins.drawio) et [`Avancement_projet_MCD_MLD.pdf`](Phase_2_Pretraitement_et_Geodatabase/modelisation_mcd_mld/Avancement_projet_MCD_MLD.pdf)
+- **DDL complet du schéma PostGIS `sante`** (8 tables, 10 clés étrangères, contraintes `CHECK`, 6 index `GIST`, 9 index `B-tree`) : [`Phase_2_Pretraitement_et_Geodatabase/sql/schema.sql`](Phase_2_Pretraitement_et_Geodatabase/sql/schema.sql)
+- **Script de nettoyage v2 avec mode `--dry-run`** (validation `make_valid`, fusion des doublons topologiques point/polygone OSM à < 35 m, découpage du graphe routier aux carrefours partagés avec 99,8 % de connectivité sur 228 554 nœuds et 318 229 tronçons, génération des 25 255 hexagones H3 rés. 8) : [`Phase_2_Pretraitement_et_Geodatabase/scripts/nettoyage.py`](Phase_2_Pretraitement_et_Geodatabase/scripts/nettoyage.py)
+- **Rapport avant/après nettoyage et planche visuelle** : [`Phase_2_Pretraitement_et_Geodatabase/preuves/rapport_nettoyage.md`](Phase_2_Pretraitement_et_Geodatabase/preuves/rapport_nettoyage.md) & [`carte_nettoyage.png`](Phase_2_Pretraitement_et_Geodatabase/preuves/carte_nettoyage.png)
+- **3 requêtes spatiales métier commentées avec `EXPLAIN (ANALYZE, BUFFERS)`** : [`Phase_2_Pretraitement_et_Geodatabase/sql/requetes.sql`](Phase_2_Pretraitement_et_Geodatabase/sql/requetes.sql) et résultats d'exécution [`resultats_requetes_seance4.md`](Phase_2_Pretraitement_et_Geodatabase/preuves/resultats_requetes_seance4.md)
+- **Dump PostGIS complet restaurable (`pg_dump -Fc`)** : [`sql/acces_soins.backup`](sql/acces_soins.backup) (42,13 Mo, restauration testée automatiquement via `pg_restore`)
+- **Couches nettoyées (GeoPackage)** : [`donnees_traitees/sante_nettoyee_couches_legeres.gpkg`](donnees_traitees/sante_nettoyee_couches_legeres.gpkg)
+
+---
+
+## ⚙️ Installation et exécution reproductible
+
+### 1. Environnement Python (versions figées)
 
 ```bash
 git clone https://github.com/meryem-souilah/Acces_soins_Region_Casablanca-Settat.git
 cd Acces_soins_Region_Casablanca-Settat
-conda env create -f environment.yml     # Python 3.11.17 + requirements-lock.txt
+conda env create -f environment.yml     # Python 3.11 + requirements-lock.txt
 conda activate geodata-sante
 ```
 
 Sans conda : Python 3.11 puis `pip install -r requirements-lock.txt`.
 
-## Collecte des données (phase 1)
+### 2. Exécution de la Phase 1 (Collecte & Contrôle)
 
 ```bash
-run_collecte.bat                                   # collecte + contrôle (Windows)
-python scripts/collecte.py                         # collecte, cache réutilisé
-python scripts/collecte.py --force                 # tout retélécharger depuis les sources
-python scripts/controle_collecte.py                # contrôle CRS, emprise, jointure HCP
+run_collecte.bat                         # Collecte + contrôle (Windows)
+python scripts/collecte.py               # Collecte (utilise le cache local si présent)
+python scripts/controle_collecte.py      # Contrôle CRS EPSG:26191, emprise, jointure HCP
 ```
 
-Le contrôle écrit `preuves/controle_collecte.md` et `preuves/carte_controle.png`,
-et sort avec le code 0 seulement si tout est conforme.
-
-## Reproductibilité dans le temps
-
-Les sources en ligne évoluent : OSM change chaque jour, Geofabrik ne conserve
-que le dernier extrait, un lien peut disparaître. Re-télécharger plus tard
-donne donc d'autres données. Pour retrouver **exactement** le jeu de données du
-projet, on part de l'archive des fichiers bruts :
+### 3. Exécution de la Phase 2 (Nettoyage & Géodatabase PostGIS)
 
 ```bash
-python scripts/collecte.py --archiver
-# → sauvegarde_sources/sources_brutes_AAAA-MM-JJ.zip : fichiers bruts exacts + manifeste
-
-python scripts/collecte.py --depuis-archive sauvegarde_sources/sources_brutes_2026-10-22.zip
-python scripts/controle_collecte.py
-# → restaure les fichiers, vérifie leurs SHA-256, rejoue le traitement hors ligne
+run_seance4.bat                          # Exécute toute la Phase 2 (Windows)
+python scripts/nettoyage.py --dry-run    # Mode rapport seul (aucune écriture de fichier)
+python scripts/nettoyage.py              # Nettoyage complet + export GeoPackage
+python scripts/import_postgis.py         # Création schéma PostGIS, import ogr2ogr, 3 requêtes EXPLAIN ANALYZE, pg_dump
 ```
 
-L'archive (262 Mo) dépasse la limite de GitHub pour un dépôt : elle est publiée
-en **Release** du dépôt. Pour la récupérer :
+Pour restaurer directement la base PostGIS complète (`acces_soins`) sans relancer le pipeline :
 
 ```bash
-gh release download donnees-2026-10-22 --dir sauvegarde_sources
+psql -U postgres -c "CREATE DATABASE acces_soins;"
+pg_restore -U postgres -d acces_soins --no-owner --no-privileges sql/acces_soins.backup
 ```
 
-| Garantie | Comment |
-|---|---|
-| Même code | dépôt Git |
-| Même environnement | `environment.yml`, `requirements-lock.txt` (versions exactes) |
-| Mêmes données brutes | archive en Release, SHA-256 vérifiés à la restauration |
-| Même résultat | `controle_collecte.py` : 153 communes, 1 588 établissements, 130 813 tronçons, 7 466 216 hab. |
+---
 
-## Arborescence
+## 🌳 Arborescence complète du dépôt
 
+```text
+Acces_soins_Region_Casablanca-Settat/
+├── Phase_0_Cadrage_et_Audit_Sources/       # Livrables Séance 2 (cadrage, audit des 5 sources, échantillons)
+├── Phase_1_Acquisition_et_Collecte/        # Livrables Séance 3 (scripts collecte/contrôle, manifeste SHA-256, UML, présentation)
+├── Phase_2_Pretraitement_et_Geodatabase/   # Livrables Séance 4 (MCD/MLD, schema.sql, nettoyage.py, requetes.sql, rapport, présentation)
+├── Phase_3_Traitement_et_GeoAI/            # Séance 5 (À venir : routage Dijkstra, accessibilité H3, modèle Geo-AI)
+├── Phase_4_Controle_Qualite/               # Séance 6 (À venir : contrôle qualité ISO 19157 et validation spatiale)
+├── Phase_5_Diffusion_et_Recommandations/   # Séance 7 (À venir : cartographie décisionnelle et recommandations)
+├── scripts/                                # Scripts techniques d'exécution directe à la racine
+├── sql/                                    # DDL PostGIS (schema.sql), 3 requêtes métier (requetes.sql) et dump (acces_soins.backup)
+├── donnees_brutes/                         # Données brutes par source (limites, osm_sante, worldpop, hcp, manifest.json)
+├── donnees_traitees/                       # Données nettoyées en EPSG:26191 (GeoPackage)
+├── preuves/                                # Rapports automatiques, plans EXPLAIN ANALYZE, cartes et projet QGIS
+└── presentation/                           # Supports de présentation PDF et sources Beamer (.tex) des séances 3 et 4
 ```
-scripts/             config.py, collecte.py, controle_collecte.py
-donnees_brutes/      un dossier par source ; seuls README, manifeste, requêtes et CSV HCP sont versionnés
-preuves/             rapport et carte de contrôle, capture et projet QGIS
-presentation/        présentations des séances (LaTeX)
-sauvegarde_sources/  archive des sources brutes (non versionnée, publiée en Release)
-donnees_traitees/    données nettoyées (phase 2)
-sql/                 schéma PostGIS et requêtes métier (phase 2)
-notebooks/           exploration des données
-docs/                document de 1er jet, schémas, documentation
-```
-
-## Avancement
-
-| Phase | Séance | Statut |
-|---|---|---|
-| 0. Choix du thème et audit des sources | Séance 2 | ✅ Réalisé |
-| 1. Collecte (script reproductible) | Séance 3 | ✅ Réalisé |
-| 2. Pré-traitement et géodatabase PostGIS | Séance 4 | ⚪ À venir |
-| 3. Traitement et Geo-AI | Séance 5 | ⚪ À venir |
-| 4. Contrôle qualité | Séance 6 | ⚪ À venir |
-| 5. Diffusion et recommandations | Séance 7 | ⚪ À venir |
-
-
-
-

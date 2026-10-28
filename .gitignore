@@ -1,26 +1,36 @@
-# Données : on versionne la structure et la provenance, pas les fichiers lourds
-# (limite GitHub 100 Mo). Ils se régénèrent avec scripts/collecte.py et leur
-# SHA-256 est consigné dans donnees_brutes/manifest.json.
+# Données brutes : on versionne la structure, la provenance et les couches légères (< 2 Mo),
+# mais pas l'archive routière Geofabrik lourde (> 100 Mo, limite GitHub).
 donnees_brutes/**
 !donnees_brutes/**/
 !donnees_brutes/README.md
 !donnees_brutes/manifest.json
 !donnees_brutes/osm_sante/requete.overpassql
+!donnees_brutes/osm_sante/etablissements_sante.gpkg
 !donnees_brutes/limites/requete_communes.overpassql
+!donnees_brutes/limites/limites_casablanca_settat.gpkg
+!donnees_brutes/worldpop/worldpop_2020_casablanca_settat_26191.tif
 !donnees_brutes/hcp/tableaux_bruts_region.csv
+
+# Données traitées : le GeoPackage complet avec les 318 229 tronçons routiers (115 Mo)
+# dépasse la limite GitHub de 100 Mo ; on versionne le GeoPackage léger (8 Mo)
+# ainsi que le dump PostGIS complet compressé sql/acces_soins.backup (42 Mo).
+donnees_traitees/sante_nettoyee.gpkg
+donnees_traitees/*.gpkg-shm
+donnees_traitees/*.gpkg-wal
 
 # Caches de requêtes (osmnx, Overpass)
 cache/
 
-# Python / Jupyter
+# Python / Jupyter / OS
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
 *.part
+desktop.ini
 
 # Secrets
 .env
 
-# Archives des sources brutes (publiees en Release GitHub, trop lourdes pour le depot)
+# Archives des sources brutes (publiées en Release GitHub, trop lourdes pour le dépôt)
 sauvegarde_sources/
-presentation/
+presentation/*.zip

@@ -9,13 +9,13 @@
       "mode": "automatique (API Overpass) — cache local réutilisé",
       "licence": "ODbL 1.0 — © contributeurs OpenStreetMap (codes communaux HCP)",
       "crs_origine": "EPSG:4326",
-      "date_donnees_osm": "2026-07-28T02:16:18Z",
+      "date_donnees_osm": "2026-10-28T19:39:47Z",
       "requete": "donnees_brutes/limites/requete_communes.overpassql",
       "fichiers_origine": [
         {
           "chemin": "donnees_brutes/limites/overpass_communes.json",
           "taille_mo": 1.47,
-          "sha256": "77a3d15755f17d929588f6f120ea61b0af33e055a1dfae9df89450fc35fd7ae4"
+          "sha256": "f38e30f3d5c46e9e4eca19265e4ee3e69bd978d5eea78d9e33e445cd74069fef"
         }
       ],
       "nb_communes": 153,
@@ -36,7 +36,7 @@
         {
           "chemin": "donnees_brutes/limites/limites_casablanca_settat.gpkg",
           "taille_mo": 1.02,
-          "sha256": "a41e9f0ddabc5d950d74f0c4c884bd3ca3a78813113cf8a9e4c17212ad75a823"
+          "sha256": "c4a870a1285a51fe7915c8647b20a2e6229b74d636fe47e33be76c8086663ecc"
         }
       ],
       "surface_region_km2": 20207.3,
@@ -47,53 +47,53 @@
         360575
       ],
       "statut": "OK",
-      "date_collecte": "2026-10-22T14:45:36Z",
+      "date_collecte": "2026-10-28T19:43:16Z",
       "duree_s": 1.3,
       "date_telechargement": "2026-10-21T21:09:56Z"
     },
     "sante": {
       "titre": "Établissements de santé (hôpitaux, cliniques, médecins, dentistes, pharmacies)",
       "producteur": "Contributeurs OpenStreetMap",
-      "url": "https://overpass.kumi.systems/api/interpreter",
-      "mode": "automatique (API Overpass) — cache local réutilisé",
+      "url": "https://overpass-api.de/api/interpreter",
+      "mode": "automatique (API Overpass)",
       "licence": "ODbL 1.0 — © contributeurs OpenStreetMap",
       "crs_origine": "EPSG:4326",
       "crs_sortie": "EPSG:26191",
-      "date_donnees_osm": "2026-07-24T11:04:51Z",
+      "date_donnees_osm": "2026-10-28T19:42:49Z",
       "requete": "donnees_brutes/osm_sante/requete.overpassql",
       "fichiers_origine": [
         {
           "chemin": "donnees_brutes/osm_sante/overpass_reponse.json",
           "taille_mo": 0.51,
-          "sha256": "74c64f9a0a17f7606151df0ccdc3583204c4b9470e792eb0864f8df5fe439cbf"
+          "sha256": "f5d42056cca444f5ab1b6f3b04a26f81d6cd24bf84000d2c45318acd9d327d48"
         }
       ],
       "fichiers_sortie": [
         {
           "chemin": "donnees_brutes/osm_sante/etablissements_sante.gpkg",
           "taille_mo": 0.37,
-          "sha256": "d49e3a97217d89210bc2abdfeb0b109345528e44a68c141e156c3a5c4868884d"
+          "sha256": "87d022bfbce9da50f8bc8a7740f3534b331dcd8ff78694268f74936ec3805f6c"
         }
       ],
-      "nb_entites_rectangle": 1734,
-      "nb_entites_region": 1588,
+      "nb_entites_rectangle": 1737,
+      "nb_entites_region": 1591,
       "repartition": {
-        "pharmacy": 1260,
-        "hospital": 82,
+        "pharmacy": 1259,
+        "hospital": 83,
         "clinic": 74,
-        "doctors": 70,
-        "dentist": 57,
+        "doctors": 71,
+        "dentist": 58,
         "healthcare=laboratory": 23,
         "healthcare=yes": 6,
         "healthcare=physiotherapist": 4,
         "healthcare=counselling": 2,
-        "healthcare=blood_bank": 1
+        "healthcare=pharmacy": 1
       },
-      "sans_nom_pct": 8.8,
+      "sans_nom_pct": 8.7,
       "statut": "OK",
-      "date_collecte": "2026-10-22T14:45:36Z",
-      "duree_s": 0.3,
-      "date_telechargement": "2026-10-21T21:11:20Z"
+      "date_collecte": "2026-10-28T19:44:03Z",
+      "duree_s": 47.0,
+      "date_telechargement": "2026-10-28T19:44:03Z"
     },
     "routes": {
       "titre": "Réseau routier circulable (niveau « complet »)",
@@ -102,42 +102,42 @@
       "url": "https://download.geofabrik.de/africa/morocco-latest-free.shp.zip",
       "mode": "automatique (extrait Geofabrik) — cache local réutilisé",
       "licence": "ODbL 1.0 — © contributeurs OpenStreetMap",
-      "date_donnees_osm": "2026-10-14T20:21:12Z",
+      "date_donnees_osm": "2026-10-27T21:23:59Z",
       "crs_origine": "EPSG:4326",
       "crs_sortie": "EPSG:26191",
       "fichiers_origine": [
         {
           "chemin": "donnees_brutes/osm_routes/morocco-261014-free.shp/gis_osm_roads_free_1.shp",
-          "taille_mo": 343.9,
-          "sha256": "07bed9df916a067104d7b44954dd94004f3eaae8522470d6be9a863e912e744d"
+          "taille_mo": 344.02,
+          "sha256": "2aa0ced7952cec3a3cd5646e7f10b6703b445fecc3592364cb6b0660d66fe227"
         }
       ],
       "fichiers_sortie": [
         {
           "chemin": "donnees_brutes/osm_routes/routes_casablanca_settat.gpkg",
-          "taille_mo": 57.86,
-          "sha256": "d26d0f9826367cf99cb223e376f9e9aebcd9e2da63f23ea3711d49460ccd920b"
+          "taille_mo": 57.26,
+          "sha256": "29aa13dc6e12391f1c535a470e5de611430ac7730d123c9a950291b27f642a29"
         }
       ],
-      "nb_troncons": 130813,
-      "longueur_km": 53890,
+      "nb_troncons": 130783,
+      "longueur_km": 53907,
       "types_voies": {
-        "residential": 53059,
-        "track": 44519,
-        "service": 12426,
-        "unclassified": 6189,
-        "tertiary": 4406,
+        "residential": 53065,
+        "track": 44539,
+        "service": 12367,
+        "unclassified": 6191,
+        "tertiary": 4403,
         "secondary": 2662,
-        "primary": 2516,
-        "living_street": 1966,
+        "primary": 2521,
+        "living_street": 1964,
         "trunk": 1113,
         "motorway": 386
       },
       "avertissement": "Tronçons découpés au contour régional, non topologisés : le graphe (nœuds aux intersections, ponts et tunnels via « layer ») se construit au pré-traitement (intersession 3).",
       "statut": "OK",
-      "date_collecte": "2026-10-22T15:03:48Z",
-      "duree_s": 1060.5,
-      "date_telechargement": "2026-10-15T20:45:36Z"
+      "date_collecte": "2026-10-28T19:53:34Z",
+      "duree_s": 10.1,
+      "date_telechargement": "2026-10-28T19:49:25Z"
     },
     "worldpop": {
       "titre": "Population maillée 100 m, 2020, version « constrained »",
@@ -156,29 +156,29 @@
       "fichiers_origine": [
         {
           "chemin": "donnees_brutes/worldpop/mar_ppp_2020_constrained.tif",
-          "taille_mo": 13.87,
-          "sha256": "84960c7fe252e79c06e07b8141f21c064971aefb6908f4772946f2f7447893aa"
+          "taille_mo": 1.19,
+          "sha256": "0f3bbb317fb16c0a3ae710c6a8f2e9d8520e7c77f0ba0f49a80906688487cb8d"
         }
       ],
       "fichiers_sortie": [
         {
           "chemin": "donnees_brutes/worldpop/worldpop_2020_casablanca_settat_4326.tif",
           "taille_mo": 0.65,
-          "sha256": "2fedd59aca231378c733180ea678fd7a9cabcc38a52741c0a0b5c911995b4804"
+          "sha256": "f8b4cfdd241eae5fc6736e9c29745c96abf39a59a2c1187321fdf39e6f3c7556"
         },
         {
           "chemin": "donnees_brutes/worldpop/worldpop_2020_casablanca_settat_26191.tif",
           "taille_mo": 0.69,
-          "sha256": "aa5850c896915a83fe921c437fe6e231af064a5a9abc4424650f86af0b62264a"
+          "sha256": "e4e29b2eda9c049bb4ef8b35f3f8624544427edbfbb6009fdfa92268e3a250f5"
         }
       ],
-      "population_region_4326": 7466216,
-      "population_region_26191": 7466216,
-      "ecart_reprojection_pct": 0.0,
+      "population_region_4326": 7461204,
+      "population_region_26191": 7461202,
+      "ecart_reprojection_pct": -0.0,
       "statut": "OK",
-      "date_collecte": "2026-10-22T14:45:38Z",
-      "duree_s": 2.0,
-      "date_telechargement": "2026-10-15T17:56:54Z"
+      "date_collecte": "2026-10-28T19:44:05Z",
+      "duree_s": 2.2,
+      "date_telechargement": "2026-10-28T19:02:43Z"
     },
     "hcp": {
       "titre": "Population légale RGPH 2024 (régions, provinces, communes)",
@@ -240,5 +240,5 @@
       "date_telechargement": "2026-10-21T21:11:25Z"
     }
   },
-  "derniere_collecte": "2026-10-22T15:03:48Z"
+  "derniere_collecte": "2026-10-28T19:53:34Z"
 }

@@ -397,7 +397,21 @@ def etape_routes(force: bool, filtre_routes: str = "complet") -> dict:
                            where=f"fclass IN ({liste})")
     crs_origine = routes.crs.to_string()
     n_bbox = len(routes)
-    routes = gpd.clip(routes.to_crs(CRS_CIBLE), region).explode(index_parts=False)
+    routes = routes.to_crs(CRS_CIBLE)
+    import shapely
+    poly_reg = region.geometry.iloc[0]
+    bord_reg = poly_reg.boundary
+    shapely.prepare(poly_reg)
+    shapely.prepare(bord_reg)
+    geoms = routes.geometry.to_numpy()
+    touche_bord = shapely.intersects(bord_reg, geoms)
+    dedans = (~touche_bord) & shapely.contains(poly_reg, geoms)
+    r_dedans = routes[dedans]
+    r_bord = gpd.clip(routes[touche_bord], region)
+    routes = gpd.GeoDataFrame(
+        __import__("pandas").concat([r_dedans, r_bord], ignore_index=True),
+        geometry="geometry", crs=CRS_CIBLE
+    ).explode(index_parts=False)
     routes = routes[routes.geom_type == "LineString"].reset_index(drop=True)
     routes["longueur_m"] = routes.length.round(1)
     sortie.unlink(missing_ok=True)
