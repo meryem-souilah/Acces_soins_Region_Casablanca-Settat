@@ -1,0 +1,12 @@
+# Environnement du projet, versions figées :
+#   conda env create -f environment.yml
+#   conda activate geodata-sante
+# Python vient de conda ; les bibliothèques sont des wheels pip qui embarquent
+# leurs propres GDAL/PROJ (aucun conflit avec PostgreSQL/PostGIS sous Windows).
+# requirements-lock.txt = l'environnement exact qui a produit le jeu de données.
+name: geodata-sante
+dependencies:
+  - python=3.11.17
+  - pip
+  - pip:
+      - -r requirements-lock.txt

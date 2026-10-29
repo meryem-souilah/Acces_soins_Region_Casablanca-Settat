@@ -1,0 +1,19 @@
+# Dépendances directes du projet, versions exactes (celles qui ont produit le jeu de données).
+# Versions figées pour que le pipeline se rejoue à l'identique dans le temps :
+# ne pas remplacer « == » par « >= » sans relancer collecte.py et controle_collecte.py.
+# Environnement complet, dépendances indirectes comprises : requirements-lock.txt
+geopandas==1.2.0
+pyogrio==0.13.0
+rasterio==1.4.4
+shapely==2.2.0
+pyproj==3.7.2
+numpy==2.4.6
+pandas==3.0.6
+matplotlib==3.11.2
+pdfplumber==0.11.10
+requests==2.34.2
+osmnx==2.1.1
+psycopg2-binary==2.9.13
+sqlalchemy==2.1.4
+geoalchemy2==0.20.0
+scikit-learn==1.9.1
