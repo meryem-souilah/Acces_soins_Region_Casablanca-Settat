@@ -3,7 +3,7 @@
 Ce fichier est **généré par `scripts/collecte.py`** à chaque exécution : ne pas le modifier à la main. La version machine est `manifest.json`.
 
 - Projet : Accès aux soins — région Casablanca-Settat
-- Dernière collecte : 2026-10-28T19:53:34Z
+- Dernière collecte : 2026-10-29T17:53:29Z
 - CRS de toutes les couches produites : **EPSG:26191** (Merchich / Nord Maroc)
 - Rejouer : `python scripts/collecte.py` (cache réutilisé) ou `--force` (tout retélécharger)
 - Les fichiers volumineux ne sont pas versionnés (limite GitHub) : leur SHA-256 ci-dessous permet de vérifier qu'un nouveau téléchargement est identique.
@@ -70,20 +70,20 @@ donnees_brutes/
 - **url** : https://download.geofabrik.de/africa/morocco-latest-free.shp.zip
 - **mode** : automatique (extrait Geofabrik) — cache local réutilisé
 - **licence** : ODbL 1.0 — © contributeurs OpenStreetMap
-- **date telechargement** : 2026-10-28T19:49:25Z
-- **date collecte** : 2026-10-28T19:53:34Z
+- **date telechargement** : 2026-10-29T17:46:10Z
+- **date collecte** : 2026-10-29T17:53:29Z
 - **crs origine** : EPSG:4326
 - **crs sortie** : EPSG:26191
 - **avertissement** : Tronçons découpés au contour régional, non topologisés : le graphe (nœuds aux intersections, ponts et tunnels via « layer ») se construit au pré-traitement (intersession 3).
-- date donnees osm : 2026-10-27T21:23:59Z
-- nb troncons : 130783
-- longueur km : 53907
-- types voies : {'residential': 53065, 'track': 44539, 'service': 12367, 'unclassified': 6191, 'tertiary': 4403, 'secondary': 2662, 'primary': 2521, 'living_street': 1964, 'trunk': 1113, 'motorway': 386}
+- date donnees osm : 2026-10-28T21:21:02Z
+- nb troncons : 130807
+- longueur km : 53910
+- types voies : {'residential': 53085, 'track': 44539, 'service': 12371, 'unclassified': 6191, 'tertiary': 4403, 'secondary': 2662, 'primary': 2521, 'living_street': 1964, 'trunk': 1113, 'motorway': 386}
 
 | Fichier | Rôle | Taille (Mo) | SHA-256 |
 | --- | --- | --- | --- |
-| `donnees_brutes/osm_routes/morocco-261014-free.shp/gis_osm_roads_free_1.shp` | origine | 344.02 | `2aa0ced7952cec3a…` |
-| `donnees_brutes/osm_routes/routes_casablanca_settat.gpkg` | produit | 57.26 | `29aa13dc6e12391f…` |
+| `donnees_brutes/osm_routes/morocco-latest-free.shp.zip` | origine | 470.21 | `59db5efe314a5449…` |
+| `donnees_brutes/osm_routes/routes_casablanca_settat.gpkg` | produit | 57.27 | `6bf1f717bbc858bf…` |
 
 ## Population maillée 100 m, 2020, version « constrained »
 

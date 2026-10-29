@@ -2,6 +2,7 @@
 # Versions figées pour que le pipeline se rejoue à l'identique dans le temps :
 # ne pas remplacer « == » par « >= » sans relancer collecte.py et controle_collecte.py.
 # Environnement complet, dépendances indirectes comprises : requirements-lock.txt
+openpyxl>=3.1
 geopandas==1.2.0
 pyogrio==0.13.0
 rasterio==1.4.4

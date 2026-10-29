@@ -6,6 +6,7 @@
 # requirements-lock.txt = l'environnement exact qui a produit le jeu de données.
 name: geodata-sante
 dependencies:
+  - openpyxl
   - python=3.11.17
   - pip
   - pip:
