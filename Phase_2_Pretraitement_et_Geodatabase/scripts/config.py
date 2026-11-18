@@ -26,6 +26,16 @@ for _var, _sous in (("PROJ_DATA", ("Library", "share", "proj")),
     elif not str(Path(os.environ.get(_var, _prefixe))).lower().startswith(_prefixe.lower()):
         del os.environ[_var]
 
+# ── MKL : couche de threads compatible (avant tout import de numpy) ───────────
+# numpy (conda) calcule ses produits de matrices avec Intel MKL 2026.1. Sa couche de
+# threads par défaut (OpenMP, libiomp5md de llvm-openmp 23) est incompatible : tout
+# produit matriciel fait planter Python sans message (Windows 0xc06d007f), dans
+# matplotlib, rasterio, scikit-learn… La couche TBB fonctionne ; à défaut, séquentiel.
+# Sans effet si numpy n'utilise pas MKL (wheels pip avec OpenBLAS).
+if "MKL_THREADING_LAYER" not in os.environ:
+    _tbb = any(Path(_prefixe, *d, "tbb12.dll").exists() for d in (("Library", "bin"), ()))
+    os.environ["MKL_THREADING_LAYER"] = "TBB" if _tbb else "SEQUENTIAL"
+
 # ── Racine de la Phase 1 (dossier parent de scripts/) ────────────────────────
 RACINE = Path(__file__).resolve().parent.parent
 DONNEES_BRUTES = RACINE.parent / "Phase_1_Acquisition_et_Collecte" / "donnees_brutes"
