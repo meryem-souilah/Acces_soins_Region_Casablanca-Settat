@@ -1,3 +1,10 @@
+-- Tests des contraintes du schéma « sante ». Chaque test est isolé dans BEGIN … ROLLBACK :
+-- la base reste inchangée. Sauf mention « doit être ACCEPTÉ », l'écriture doit être REFUSÉE.
+-- Les identifiants de test (P_TEST, C_TEST, nœuds -1 et -2) n'existent pas dans les données
+-- réelles : les tests passent aussi sur la base remplie.
+
+-- Test 1 : une géométrie doit être en EPSG:26191 (SRID 4326 refusé)
+
 BEGIN;
 INSERT INTO sante.province VALUES ('P_TEST', 'Province test', 'province',
   ST_SetSRID(ST_Multi(ST_MakeEnvelope(300000, 330000, 301000, 331000)), 4326));
@@ -74,9 +81,9 @@ ROLLBACK;
 -- Test 8 : un tronçon ne peut pas partir et arriver au même nœud
 
 BEGIN;
-INSERT INTO sante.noeud VALUES (1, ST_SetSRID(ST_MakePoint(300000, 330000), 26191));
+INSERT INTO sante.noeud VALUES (-1, ST_SetSRID(ST_MakePoint(300000, 330000), 26191));
 INSERT INTO sante.troncon (type_voie, longueur_m, vitesse_kmh, noeud_depart, noeud_arrivee, geom)
-VALUES ('primary', 100, 80, 1, 1,
+VALUES ('primary', 100, 80, -1, -1,
   ST_SetSRID(ST_MakeLine(ST_MakePoint(300000, 330000), ST_MakePoint(300100, 330000)), 26191));
 ROLLBACK;
 
@@ -84,10 +91,10 @@ ROLLBACK;
 -- Test 9 : un tronçon a une longueur strictement positive
 
 BEGIN;
-INSERT INTO sante.noeud VALUES (1, ST_SetSRID(ST_MakePoint(300000, 330000), 26191));
-INSERT INTO sante.noeud VALUES (2, ST_SetSRID(ST_MakePoint(300100, 330000), 26191));
+INSERT INTO sante.noeud VALUES (-1, ST_SetSRID(ST_MakePoint(300000, 330000), 26191));
+INSERT INTO sante.noeud VALUES (-2, ST_SetSRID(ST_MakePoint(300100, 330000), 26191));
 INSERT INTO sante.troncon (type_voie, longueur_m, vitesse_kmh, noeud_depart, noeud_arrivee, geom)
-VALUES ('primary', 0, 80, 1, 2,
+VALUES ('primary', 0, 80, -1, -2,
   ST_SetSRID(ST_MakeLine(ST_MakePoint(300000, 330000), ST_MakePoint(300100, 330000)), 26191));
 ROLLBACK;
 

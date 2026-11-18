@@ -1,0 +1,154 @@
+﻿couche;id;regle;avant;apres
+etablissement;node/2714951128;type déduit du nom (contredit le tag);clinique (amenity=clinic);dentiste : clinique dentaire casablanca (cdc)
+etablissement;node/2902579703;type déduit du nom (contredit le tag);hopital (amenity=hospital);dentiste : Centre consultation et traitement dentaires
+etablissement;node/3935697583;type déduit du nom (contredit le tag);clinique (amenity=clinic);hopital : clinique fedala مستشفى مولاي عبد الله
+etablissement;node/4011384596;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Centre de kinésitherapie et rééducation fonctionelle, Dr.Kourkmadi
+etablissement;node/4194268649;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Laboratoire Bouzoubaa
+etablissement;node/4368515792;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : centre kine forme
+etablissement;node/4542033085;type déduit du nom (contredit le tag);hopital (amenity=hospital);pharmacie : Azzouzi صيدلية العزوزي
+etablissement;node/4720305016;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Radiologie ksiyer الفحص بالأشعة قصير
+etablissement;node/5038392422;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Laboratoire Yafa
+etablissement;node/5291949618;type déduit du nom (contredit le tag);clinique (amenity=clinic);autre : Laboratoire d'analyses médicales Attacharouk
+etablissement;node/5424315622;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : centre radiologie abdelmoumen مركز الفحص بالأشعة عبدالمومن
+etablissement;node/5591121619;type déduit du nom (contredit le tag);clinique (amenity=clinic);autre : Laboratore de Biologie Medicale Casa Analyses
+etablissement;node/5636207705;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique les princes مصحة الأمراء
+etablissement;node/5636207784;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Laboratoire Labomedic
+etablissement;node/5640584531;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Radiologie Socrate
+etablissement;node/5652654432;type déduit du nom (contredit le tag);autre (amenity=nan);dentiste : Radiologie Scanner IRM Imagierie Dentaire
+etablissement;node/5657171560;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Laboratoire
+etablissement;node/6411403481;type déduit du nom (contredit le tag);hopital (amenity=hospital);autre : Laboratory
+etablissement;node/6433091122;type déduit du nom (contredit le tag);autre (amenity=nan);hopital : Centre Hospitalier Soualem
+etablissement;node/6593222260;type déduit du nom (contredit le tag);autre (amenity=nan);centre_sante : Dispensaire Sidi Maarouf
+etablissement;node/9613551606;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinical Les Fleurs
+etablissement;node/9620628034;type déduit du nom (contredit le tag);centre_sante (amenity=nan);autre : centre de dialyse wardani
+etablissement;node/9620684483;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Radiologie du Centre الفحص بالأشعة المركز
+etablissement;node/9620754118;type déduit du nom (contredit le tag);medecin (amenity=nan);autre : RADIOLOGIE ZERKTOUNI 59
+etablissement;node/10073064473;type déduit du nom (contredit le tag);hopital (amenity=hospital);autre : Centre d'Hémodialyse
+etablissement;node/10899491806;type déduit du nom (contredit le tag);medecin (amenity=doctors);dentiste : nan
+etablissement;node/11045850259;type déduit du nom (contredit le tag);hopital (amenity=hospital);autre : Kiné oum & co
+etablissement;node/13093077991;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Casa Radiologie
+etablissement;node/13179386469;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Attal
+etablissement;node/13205221671;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Socrate
+etablissement;node/13261125353;type déduit du nom (contredit le tag);clinique (amenity=clinic);hopital : Hôpital Privé de Casablanca Aîn Sebaâ
+etablissement;node/13920299775;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Taha مصحة طه
+etablissement;node/14240579702;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Mazagan
+etablissement;way/167316961;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique
+etablissement;way/229704511;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique CNSS Ziraoui
+etablissement;way/243430553;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Le Littoral
+etablissement;way/286685403;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique de la Sécurité sociale
+etablissement;way/299269975;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique El Amine
+etablissement;way/320947339;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique CNSS
+etablissement;way/322202369;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Doukkala
+etablissement;way/322202376;type déduit du nom (contredit le tag);clinique (amenity=clinic);autre : Centre d'Hémodialyse Moulay Abdellah
+etablissement;way/330206537;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : Centre de Santé
+etablissement;way/417421845;type déduit du nom (contredit le tag);clinique (amenity=clinic);autre : Radiologie Anoual
+etablissement;way/420122924;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Californie
+etablissement;way/425094826;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : Centre de Santé Derb el Kheir
+etablissement;way/430965117;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique ِCNSS Sidi Bernoussi
+etablissement;way/435627815;type déduit du nom (contredit le tag);clinique (amenity=clinic);autre : Centre d'Hemodialyse 2 Mars
+etablissement;way/458067627;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : Disponsaire Smaâla
+etablissement;way/458238398;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : Dispensaire ElKheir
+etablissement;way/504405670;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique CNSS
+etablissement;way/521476354;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Polyclinique CNSS Hay Hassani مصحة الضمان الإجتماعي الحي الحسني
+etablissement;way/586890451;type déduit du nom (contredit le tag);clinique (amenity=clinic);hopital : Hôpital général de Casablanca Azhar-Bernoussi
+etablissement;way/589906164;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Al Amal
+etablissement;way/590579795;type déduit du nom (contredit le tag);medecin (amenity=doctors);autre : Radiologie
+etablissement;way/590579798;type déduit du nom (contredit le tag);clinique (amenity=clinic);autre : Centre Kinesitherapie Bouafi Amine
+etablissement;way/592116442;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Les Crêtes
+etablissement;way/663295171;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Green Town
+etablissement;way/789173050;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Mersultan
+etablissement;way/789230597;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : ATLANTIC CLINIC CASABLANCA
+etablissement;way/789265751;type déduit du nom (contredit le tag);hopital (amenity=hospital);clinique : Clinique Al Mouahhidine
+etablissement;way/789281549;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : مستوصف ميمونة
+etablissement;way/1286933921;type déduit du nom (contredit le tag);clinique (amenity=clinic);centre_sante : Centre de santé urbain niveau 1 Regraga المركز الصحي الحضري -مستوى أول- رݣراݣة
+etablissement;way/1290433169;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : Centre de santé
+etablissement;way/1318890516;type déduit du nom (contredit le tag);hopital (amenity=hospital);centre_sante : Centre de Sante Ain Harrouda
+etablissement;way/1389315700;type déduit du nom (contredit le tag);hopital (amenity=hospital);autre : Institut Pasteur معهد باستور
+etablissement;node/3908234586;type « autre » (hors analyse);non classé (amenity=—, healthcare=blood bank);autre
+etablissement;node/4011384596;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/4188292439;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/4190909393;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/4194268649;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/4368515792;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/4554695990;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/4720305016;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5038392422;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5291949618;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5424315622;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5579516434;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5591121619;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5636207784;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5640584531;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5654105790;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5654640826;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5657171560;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5668012044;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/5685795427;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/6411403481;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/9492461444;type « autre » (hors analyse);non classé (amenity=—, healthcare=physiotherapist);autre
+etablissement;node/9620628033;type « autre » (hors analyse);non classé (amenity=—, healthcare=laboratory);autre
+etablissement;node/9620628034;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/9620684483;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/9620684513;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/9620754118;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/9620906367;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/9620906371;type « autre » (hors analyse);non classé (amenity=—, healthcare=yes);autre
+etablissement;node/9621212180;type « autre » (hors analyse);non classé (amenity=—, healthcare=counselling);autre
+etablissement;node/10073064473;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/11045850259;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/11717363586;type « autre » (hors analyse);non classé (amenity=—, healthcare=yes);autre
+etablissement;node/12115596700;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/12146127501;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/12314471214;type « autre » (hors analyse);non classé (amenity=—, healthcare=counselling);autre
+etablissement;node/12449750853;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/12506546432;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/13003878511;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/13086769422;type « autre » (hors analyse);non classé (amenity=—, healthcare=laboratory);autre
+etablissement;node/13093077991;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/13093078000;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/13853903227;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;node/13915051423;type « autre » (hors analyse);non classé (amenity=—, healthcare=laboratory);autre
+etablissement;node/14239775441;type « autre » (hors analyse);non classé (amenity=—, healthcare=audiologist);autre
+etablissement;way/322202376;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/417421845;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/417976143;type « autre » (hors analyse);non classé (amenity=—, healthcare=laboratory);autre
+etablissement;way/419338731;type « autre » (hors analyse);non classé (amenity=laboratory, healthcare=laboratory);autre
+etablissement;way/435627815;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/590292157;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/590579795;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/590579798;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/594720511;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/945426156;type « autre » (hors analyse);non classé (amenity=—, healthcare=yes);autre
+etablissement;way/945426158;type « autre » (hors analyse);non classé (amenity=—, healthcare=psychotherapist);autre
+etablissement;way/1116899132;type « autre » (hors analyse);non classé (amenity=—, healthcare=rehabilitation);autre
+etablissement;way/1228959932;type « autre » (hors analyse);non classé (amenity=—, healthcare=physiotherapist);autre
+etablissement;way/1229029901;type « autre » (hors analyse);non classé (amenity=—, healthcare=physiotherapist);autre
+etablissement;way/1290433160;type « autre » (hors analyse);non classé (amenity=—, healthcare=blood donation);autre
+etablissement;way/1301592709;type « autre » (hors analyse);non classé (amenity=—, healthcare=laboratory);autre
+etablissement;way/1389315700;type « autre » (hors analyse);nom de laboratoire, kiné, dialyse… (hors analyse);autre
+etablissement;way/1428866219;type « autre » (hors analyse);non classé (amenity=—, healthcare=yes);autre
+etablissement;node/1746921493;doublon supprimé;à moins de 50 m de;node/11214425488
+etablissement;way/414875894;doublon supprimé;à moins de 50 m de;node/2714951128
+etablissement;way/424323318;doublon supprimé;à moins de 50 m de;node/4057991325
+etablissement;node/11410362969;doublon supprimé;à moins de 50 m de;node/4193605793
+etablissement;node/4542033084;doublon supprimé;à moins de 50 m de;node/4542033085
+etablissement;node/4563160364;doublon supprimé;à moins de 50 m de;node/4542752184
+etablissement;node/4562070169;doublon supprimé;à moins de 50 m de;node/8483111833
+etablissement;node/8483143887;doublon supprimé;à moins de 50 m de;node/4563362579
+etablissement;node/5282223224;doublon supprimé;à moins de 50 m de;node/5234584424
+etablissement;node/5584831651;doublon supprimé;à moins de 50 m de;node/5583278790
+etablissement;node/5625379300;doublon supprimé;à moins de 50 m de;node/5627205173
+etablissement;node/5641997754;doublon supprimé;à moins de 50 m de;node/5636182895
+etablissement;node/5654105788;doublon supprimé;à moins de 50 m de;node/11220930122
+etablissement;node/5657171537;doublon supprimé;à moins de 50 m de;node/5657171536
+etablissement;node/8446095434;doublon supprimé;à moins de 50 m de;node/5688271125
+etablissement;node/8443590471;doublon supprimé;à moins de 50 m de;way/1228709573
+etablissement;node/11397030489;doublon supprimé;à moins de 50 m de;node/8443768386
+etablissement;node/8443939484;doublon supprimé;à moins de 50 m de;way/597845040
+etablissement;node/8446084011;doublon supprimé;à moins de 50 m de;way/1239621024
+etablissement;node/9620906371;doublon supprimé;à moins de 50 m de;node/9620906367
+troncon;—;boucles supprimées (départ = arrivée);;106
+troncon;—;arêtes parallèles supprimées (plus courte gardée);;1687
+troncon;—;tronçons hors du réseau principal connexe supprimés;;553
+noeud;—;nœuds orphelins supprimés;;533
+maille_h3;—;hexagones rattachés à la commune la plus proche;;177

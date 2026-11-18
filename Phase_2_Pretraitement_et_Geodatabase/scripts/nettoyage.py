@@ -6,7 +6,8 @@ EXPLICITES et TRACÉES, et écrit des couches dont les colonnes correspondent ex
 aux tables de sql/schema.sql (prêtes pour l'import PostGIS).
 
 Étapes (dans l'ordre) :
-    communes        communes HCP : renommage, géométries valides, provinces dérivées
+    communes        communes HCP : renommage, géométries valides, provinces dérivées,
+                    population légale RGPH 2024 (jointure par code HCP)
     etablissements  tags OSM → type → niveau par défaut, corrections de relecture,
                     attributs normalisés, doublons, commune d'appartenance
     routes          tronçons et nœuds : type de voie, vitesse, sens unique,
@@ -212,12 +213,17 @@ def etape_communes(t: Trace, res: dict):
             t.log("commune", code, "morceaux de même code fusionnés")
         g = g.dissolve(by="code_hcp", as_index=False, aggfunc="first")
 
+    pop, total_region = _population_hcp()
     commune = gpd.GeoDataFrame({
         "code_hcp": g["code_hcp"].astype(str),
         "nom": g["nom"].astype(str).str.strip(),
-        "pop_2024": pd.array([pd.NA] * len(g), dtype="Int64"),
+        "pop_2024": pd.array(g["code_hcp"].astype(str).map(pop), dtype="Int64"),
         "code_province": g["code_province"].astype(str),
     }, geometry=g.geometry.apply(_multi).values, crs=CRS)
+    sans_pop = commune["pop_2024"].isna()
+    for code in commune.loc[sans_pop, "code_hcp"]:
+        t.log("commune", code, "population HCP introuvable pour ce code")
+    total_pop = int(commune["pop_2024"].sum())
 
     prov = g.dissolve(by="code_province", as_index=False, aggfunc="first")
     province = gpd.GeoDataFrame({
@@ -240,9 +246,39 @@ def etape_communes(t: Trace, res: dict):
         *tableau(["Code", "Province", "Type", "Communes"],
                  [(c, n, ty, int(nb.get(c, 0))) for c, n, ty in
                   zip(province.code_province, province.nom, province.type_province)]), "",
-        "`pop_2024` reste vide : la jointure avec les tableaux HCP est une étape à part "
-        "(appariement des noms de communes).",
+        "**Population légale RGPH 2024** (`pop_2024`) : jointure par code géographique HCP "
+        "(`code_hcp` = `code_geographique` du tableau communal), sans appariement de noms.", "",
+        *tableau(["Contrôle", "Valeur"], [
+            ("Communes avec population", f"{int((~sans_pop).sum())} / {len(commune)}"),
+            ("Somme des communes", f"{total_pop:,}".replace(",", " ")),
+            ("Total régional publié par le HCP", f"{total_region:,}".replace(",", " ")),
+            ("Écart", f"{total_pop - total_region:+,}".replace(",", " ")),
+        ]),
     ])
+
+
+def _population_hcp() -> tuple[dict, int]:
+    """Population légale 2024 par code communal, lue dans les tableaux HCP extraits du PDF.
+
+    Le tableau répète la région et les provinces (total, urbain, rural) : on ne garde que
+    les lignes communales (« Commune de … » ou « Commune d'… »), dont le code est unique.
+    Les lignes « dont le centre urbain de … » partagent un préfixe mais pas le code exact.
+    """
+    f = DB / "hcp" / "tableaux_bruts_region.csv"
+    if not f.exists():
+        raise RuntimeError(f"tableau HCP absent : {f}")
+    h = pd.read_csv(f, dtype=str)
+    h["population"] = h["population"].str.replace(r"[^\d]", "", regex=True).astype("int64")
+    region = h[(h["code_geographique"] == C.CODE_HCP_REGION) &
+               ~h["collectivite"].str.contains("milieu", case=False)]
+    total_region = int(region["population"].iloc[0])
+    com = h[h["collectivite"].str.match(r"(?i)commune\b")]
+    doublons = com[com["code_geographique"].duplicated(keep=False)]
+    if not doublons.empty and doublons.groupby("code_geographique")["population"].nunique().max() > 1:
+        raise RuntimeError("codes communaux HCP en double avec des populations différentes : "
+                           f"{sorted(doublons['code_geographique'].unique())}")
+    com = com.drop_duplicates("code_geographique")
+    return dict(zip(com["code_geographique"], com["population"])), total_region
 
 
 def _polygones(geom):
@@ -727,7 +763,9 @@ def etape_h3(t: Trace, res: dict):
     with rasterio.open(raster) as src:
         d = src.read(1, masked=True).filled(0).astype("float64")
         lignes, cols = np.nonzero(d > 0)
-        xs, ys = rasterio.transform.xy(src.transform, lignes, cols)
+        # centre des pixels par la transformation affine (identique à rasterio.transform.xy,
+        # qui passe par une DLL GDAL absente sous certains Windows : erreur 0xc06d007f)
+        xs, ys = src.transform * (cols + 0.5, lignes + 0.5)
         pop_pix = d[lignes, cols]
     total_raster = float(pop_pix.sum())
     lon, lat = Transformer.from_crs(CRS, C.CRS_GEO, always_xy=True).transform(np.array(xs), np.array(ys))

@@ -1,6 +1,6 @@
 # Rapport de nettoyage
 
-Exécuté le 2026-10-29 18:07 UTC par `scripts/nettoyage.py` — étapes : communes, routes, h3.
+Exécuté le 2026-11-17 18:17 UTC par `scripts/nettoyage.py` — étapes : communes, etablissements, routes, h3.
 
 Sortie : `donnees_propres/base_sante.gpkg`.
 
@@ -29,7 +29,40 @@ Format de la couche source : colonnes déjà normalisées (code_hcp, code_provin
 | 06.461 | Settat | province | 46 |
 | 06.467 | Sidi Bennour | province | 25 |
 
-`pop_2024` reste vide : la jointure avec les tableaux HCP est une étape à part (appariement des noms de communes).
+**Population légale RGPH 2024** (`pop_2024`) : jointure par code géographique HCP (`code_hcp` = `code_geographique` du tableau communal), sans appariement de noms.
+
+| Contrôle | Valeur |
+| --- | --- |
+| Communes avec population | 153 / 153 |
+| Somme des communes | 7 688 967 |
+| Total régional publié par le HCP | 7 688 967 |
+| Écart | +0 |
+
+## Établissements de santé
+
+| Contrôle | Avant | Après |
+| --- | --- | --- |
+| Entités | 1591 | 1571 |
+| Géométries absentes ou non ponctuelles | 0 | 0 |
+| Paires de doublons point / polygone fusionnées | — | 20 |
+| Entités supprimées comme doublons | — | 20 |
+| Hors région | 0 | 0 |
+| Sans commune par inclusion (rattachées à la plus proche) | 0 | 0 |
+| Niveaux corrigés par relecture | — | 0 |
+
+**Répartition par type et niveau**
+
+| Type | Niveau | Nombre |
+| --- | --- | --- |
+| autre | 1 | 62 |
+| centre_sante | 1 | 9 |
+| clinique | 2 | 85 |
+| dentiste | 1 | 61 |
+| hopital | 2 | 51 |
+| medecin | 1 | 58 |
+| pharmacie | 1 | 1245 |
+
+**Taux de remplissage des attributs** : `nom` 92 %, `secteur` 1 %, `nb_lits` 0 %, `urgences` 1 %.
 
 ## Réseau routier
 
