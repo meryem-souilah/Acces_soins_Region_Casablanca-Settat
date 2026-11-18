@@ -1,6 +1,6 @@
 # Rapport de fusion et d'import PostGIS
 
-Exécuté le 2026-11-18 15:32 UTC par `scripts/import_postgis.py`.
+Exécuté le 2026-11-18 19:12 UTC par `scripts/import_postgis.py`.
 
 ## Fusion des établissements
 
@@ -43,7 +43,8 @@ Base `acces_soins`, schéma `sante`, créé par `sql/Schema.sql`. Chargement par
 | msps | 1 | non | 31 |
 | msps | 1 | oui | 373 |
 | osm | 1 | non | 1435 |
-| osm | 2 | oui | 136 |
+| osm | 2 | oui | 132 |
+| osm | 3 | oui | 4 |
 
 ## Tests de contraintes (`sql/TestContraintes.sql`)
 

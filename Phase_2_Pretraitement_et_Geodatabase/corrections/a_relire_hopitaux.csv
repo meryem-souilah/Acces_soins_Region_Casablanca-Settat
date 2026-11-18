@@ -88,12 +88,12 @@ way/483562437;Ajial Hôpital Pédiatrique;hopital;Casablanca;;nan;2;;
 node/10073071769;Centre Hospitalier Provincial de Benslimane;hopital;Benslimane;;nan;2;;
 way/519061847;Centre Hospitalier Préfectoral de Ben M'Sick;hopital;Casablanca;;nan;2;;
 node/6433091122;Centre Hospitalier Soualem;hopital;Had Soualem;;nan;2;;
-way/150779200;Centre Hospitalier Universitaire Ibn Rochd;hopital;Casablanca;;public;2;3;universitaire
+way/150779200;Centre Hospitalier Universitaire Ibn Rochd;hopital;Casablanca;;public;3;3;universitaire
 way/320947340;Croissant Rouge Marocain;hopital;El Jadida;;nan;2;;
 node/13006074098;Groupe Akdital;hopital;Casablanca;;prive;2;;
 way/1065939724;Hassan II Hospital;hopital;Settat;;nan;2;;
-way/250426643;Hopital 20 Aout;hopital;Casablanca;;nan;2;3;20 aout
-way/264643479;Hopital 20 Aout;hopital;Casablanca;;nan;2;3;20 aout
+way/250426643;Hopital 20 Aout;hopital;Casablanca;;nan;3;3;20 aout
+way/264643479;Hopital 20 Aout;hopital;Casablanca;;nan;3;3;20 aout
 way/1081532793;Hopital El qorb;hopital;Ben Ahmed;;nan;2;;
 way/1309456132;Hopital Provincial Mohammed V;hopital;El Jadida;;nan;2;;
 way/451799188;Hopital provincial Errazi;hopital;Berrechid;;nan;2;;
@@ -112,7 +112,7 @@ node/13261125353;Hôpital Privé de Casablanca Aîn Sebaâ;hopital;Casablanca;;n
 way/424324240;Hôpital Sekkat;hopital;Casablanca;;nan;2;;
 way/1340795325;Hôpital Sidi El Mekki;hopital;Sidi El Mekki;;nan;2;;
 node/4057991325;Hôpital Sidi Othmane;hopital;Casablanca;;nan;2;;
-way/397657657;Hôpital du Cheikh Khalifa Ben Zayd Al-Nahyan;hopital;Casablanca;;nan;2;3;cheikh khalifa
+way/397657657;Hôpital du Cheikh Khalifa Ben Zayd Al-Nahyan;hopital;Casablanca;;nan;3;3;cheikh khalifa
 way/586890451;Hôpital général de Casablanca Azhar-Bernoussi;hopital;Casablanca;;nan;2;;
 node/7728916299;Urgences;hopital;Tit Mellil;;prive;2;;
 node/3935697583;clinique fedala;hopital;Mohammédia;;nan;2;;

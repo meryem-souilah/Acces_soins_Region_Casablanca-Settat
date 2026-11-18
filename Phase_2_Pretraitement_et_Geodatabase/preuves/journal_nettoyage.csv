@@ -147,6 +147,10 @@ etablissement;node/11397030489;doublon supprimé;à moins de 50 m de;node/844376
 etablissement;node/8443939484;doublon supprimé;à moins de 50 m de;way/597845040
 etablissement;node/8446084011;doublon supprimé;à moins de 50 m de;way/1239621024
 etablissement;node/9620906371;doublon supprimé;à moins de 50 m de;node/9620906367
+etablissement;way/150779200;niveau corrigé par relecture;2;3 — CHU Ibn Rochd, centre hospitalier universitaire de la région
+etablissement;way/250426643;niveau corrigé par relecture;2;3 — Hôpital 20 Août, rattaché au CHU Ibn Rochd
+etablissement;way/264643479;niveau corrigé par relecture;2;3 — Hôpital 20 Août (2e bâtiment), rattaché au CHU Ibn Rochd
+etablissement;way/397657657;niveau corrigé par relecture;2;3 — Hôpital universitaire Cheikh Khalifa
 troncon;—;boucles supprimées (départ = arrivée);;106
 troncon;—;arêtes parallèles supprimées (plus courte gardée);;1687
 troncon;—;tronçons hors du réseau principal connexe supprimés;;553
