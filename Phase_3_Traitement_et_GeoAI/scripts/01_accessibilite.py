@@ -68,15 +68,21 @@ NORMES = [
 
 def scenarios():
     s = [("N1_MARCHE_30", 1, "marche", 30, VITESSE_MARCHE_KMH, 2300, True, "CSU-1",
-          "norme du référentiel : accessibilité CSU 2,3 km / 30 mn")]
+          "norme du référentiel : accessibilité CSU 2,3 km / 30 mn", "stricte")]
     s.append(("N1_VOITURE_15", 1, "voiture", 15, VITESSE_REF_VOITURE_KMH, 10000, False, None,
-              "sensibilité : accès motorisé au premier recours"))
+              "sensibilité : accès motorisé au premier recours", "stricte"))
     for niv in (2, 3):
         for seuil in (15, 30, 45):
             s.append((f"N{niv}_VOITURE_{seuil}", niv, "voiture", seuil, VITESSE_REF_VOITURE_KMH,
                       seuil * VITESSE_REF_VOITURE_KMH * 1000 // 60, False, None,
                       "hypothèse : le référentiel ne fixe pas de temps d'accès aux hôpitaux "
-                      "(scénarios 15/30/45 min du cadrage)"))
+                      "(scénarios 15/30/45 min du cadrage)", "stricte"))
+    # Comparaison prévue au cadrage (Phase 0) : couverture NON stricte, un établissement de
+    # niveau supérieur couvre aussi le besoin d'un niveau inférieur.
+    s.append(("N1_MARCHE_30_NS", 1, "marche", 30, VITESSE_MARCHE_KMH, 2300, False, None,
+              "comparaison : hôpitaux et CHU comptent aussi comme soins de proximité", "non_stricte"))
+    s.append(("N2_VOITURE_30_NS", 2, "voiture", 30, VITESSE_REF_VOITURE_KMH, 20000, False, None,
+              "comparaison : les CHU comptent aussi comme hôpitaux de référence", "non_stricte"))
     return s
 
 
@@ -111,7 +117,9 @@ def tampons(cx):
                           JOIN sante.type_etablissement t USING (code_type) WHERE t.inclus_analyse),
                  fusion AS (SELECT s.code_scenario, count(*) AS nb_etab,
                                    ST_Union(ST_Buffer(e.geom, s.rayon_tampon_m, 16)) AS geom
-                            FROM sante.scenario_acces s JOIN etab e USING (code_niveau)
+                            FROM sante.scenario_acces s
+                            JOIN etab e ON (s.couverture = 'stricte' AND e.code_niveau = s.code_niveau)
+                                        OR (s.couverture = 'non_stricte' AND e.code_niveau >= s.code_niveau)
                             GROUP BY s.code_scenario)
             SELECT f.code_scenario, f.nb_etab, ST_Area(x.geom) / 1e6, x.geom
             FROM fusion f, region r,
@@ -171,16 +179,19 @@ def temps_acces(cx):
     etab = pd.read_sql("""SELECT e.id_etab, e.code_niveau, e.id_noeud, ST_Distance(e.geom, n.geom) AS d
                           FROM sante.etablissement e JOIN sante.type_etablissement t USING (code_type)
                           JOIN sante.noeud n USING (id_noeud) WHERE t.inclus_analyse""", cx)
-    calculs = {"voiture": [1, 2, 3], "marche": [1]}
+    # (niveau, couverture) par mode. Non stricte : les établissements du niveau ou supérieurs.
+    calculs = {"voiture": [(1, "stricte"), (2, "stricte"), (3, "stricte"), (2, "non_stricte")],
+               "marche": [(1, "stricte"), (1, "non_stricte")]}
     lignes, stats, info = [], {}, {}
-    for mode, niveaux in calculs.items():
+    for mode, liste in calculs.items():
         arcs, ids = graphe(cx, mode)
         info[mode] = (len(ids), len(arcs))
         v_raccord = VITESSE_MARCHE_KMH if mode == "marche" else VITESSE_RACCORD_VOITURE
         ih = ids.get_indexer(h3["id_noeud"])  # -1 si le nœud n'est pas dans le graphe piéton
         r_h3 = h3["d"].to_numpy() / 1000 / v_raccord * 60
-        for niv in niveaux:
-            et = etab[etab["code_niveau"] == niv].assign(raccord_min=lambda x: x["d"] / 1000 / v_raccord * 60)
+        for niv, couv in liste:
+            garde = etab["code_niveau"] == niv if couv == "stricte" else etab["code_niveau"] >= niv
+            et = etab[garde].assign(raccord_min=lambda x: x["d"] / 1000 / v_raccord * 60)
             dist, racine = dijkstra_niveau(arcs, ids, et)
             ok = ih >= 0
             t = np.full(len(h3), np.inf)
@@ -188,12 +199,13 @@ def temps_acces(cx):
             rac = np.full(len(h3), -1)
             rac[ok] = racine[ih[ok]]
             ok &= np.isfinite(t) & (rac >= 0)
-            stats[(niv, mode)] = {"etab": len(et), "injoignables": int((~ok).sum())}
-            lignes += list(zip(h3["h3_index"][ok].tolist(), [niv] * int(ok.sum()), [mode] * int(ok.sum()),
+            stats[(niv, mode, couv)] = {"etab": len(et), "injoignables": int((~ok).sum())}
+            k = int(ok.sum())
+            lignes += list(zip(h3["h3_index"][ok].tolist(), [niv] * k, [mode] * k, [couv] * k,
                                np.round(t[ok], 2).tolist(), rac[ok].tolist()))
     with cx, cx.cursor() as cur:
-        execute_values(cur, "INSERT INTO sante.temps_acces (h3_index, code_niveau, mode, temps_min, id_etab) "
-                       "VALUES %s", lignes, page_size=10000)
+        execute_values(cur, "INSERT INTO sante.temps_acces (h3_index, code_niveau, mode, couverture, temps_min, "
+                       "id_etab) VALUES %s", lignes, page_size=10000)
         cur.execute("ANALYZE sante.temps_acces")
     return time.time() - t0, info, stats
 
@@ -208,7 +220,8 @@ def carte(sortie):
 
     eng = K.moteur()
     g = gpd.read_postgis("""SELECT t.code_niveau, t.mode, t.temps_min, m.geom FROM sante.temps_acces t
-                            JOIN sante.maille_h3 m USING (h3_index) WHERE m.population > 0""", eng, geom_col="geom")
+                            JOIN sante.maille_h3 m USING (h3_index)
+                            WHERE m.population > 0 AND t.couverture = 'stricte'""", eng, geom_col="geom")
     prov = gpd.read_postgis("SELECT geom FROM sante.province", eng, geom_col="geom")
     etab = gpd.read_postgis("""SELECT e.code_niveau, e.geom FROM sante.etablissement e
                                JOIN sante.type_etablissement t USING (code_type) WHERE t.inclus_analyse""",
@@ -242,7 +255,7 @@ def rapport(cx, t_tampon, t_reseau, info, stats):
     cov = pd.read_sql("""SELECT code_scenario, code_niveau, mode, seuil_min, normatif, code_province,
                                 pop_2024, couvert_reseau, couvert_tampon, temps_min
                          FROM sante.v_couverture_h3 WHERE pop_2024 > 0""", cx)
-    sc = pd.read_sql("SELECT * FROM sante.scenario_acces ORDER BY code_niveau, mode DESC, seuil_min", cx)
+    sc = pd.read_sql("SELECT * FROM sante.scenario_acces ORDER BY code_niveau, couverture DESC, mode DESC, seuil_min", cx)
     prov = pd.read_sql("SELECT code_province, nom FROM sante.province", cx).set_index("code_province")["nom"]
     total = pd.read_sql("SELECT sum(pop_2024) FROM sante.v_maille_pop", cx).iloc[0, 0]
     pct = lambda a, b: f"{100 * a / b:.1f} %" if b else "—"  # noqa: E731
@@ -260,13 +273,18 @@ def rapport(cx, t_tampon, t_reseau, info, stats):
           "4,6 km/h). Pour les hôpitaux, le référentiel raisonne en population desservie (province, région), "
           "pas en temps : les seuils en voiture restent des hypothèses, signalées comme telles.", "",
           "## Scénarios", "",
-          *K.tableau(["Scénario", "Niveau", "Mode", "Seuil", "Rayon du tampon", "Statut"],
+          *K.tableau(["Scénario", "Niveau", "Mode", "Seuil", "Rayon du tampon", "Couverture", "Statut"],
                      [(r.code_scenario, r.code_niveau, r.mode, f"{r.seuil_min} min",
-                       f"{r.rayon_tampon_m / 1000:g} km", "**normatif**" if r.normatif else "hypothèse")
+                       f"{r.rayon_tampon_m / 1000:g} km", r.couverture.replace("_", " "),
+                       "**normatif**" if r.normatif else
+                       ("comparaison (cadrage)" if r.couverture == "non_stricte" else "hypothèse"))
                       for r in sc.itertuples()]), "",
           f"Raccordement centre d'hexagone → route et route → établissement : {VITESSE_MARCHE_KMH} km/h à pied, "
-          f"{VITESSE_RACCORD_VOITURE} km/h en voiture. Couverture stricte : un établissement ne couvre que "
-          "son niveau.", "",
+          f"{VITESSE_RACCORD_VOITURE} km/h en voiture. Couverture stricte (règle du cadrage) : un établissement "
+          "ne couvre que son niveau. Couverture non stricte (comparaison prévue au cadrage) : les établissements "
+          "de niveau supérieur couvrent aussi le niveau étudié.", "",
+          "Niveau 1 = centres de santé et dispensaires du Ministère + cabinets médicaux OSM (cadrage, Phase 0). "
+          "Les centres de santé OSM restent exclus pour ne pas compter deux fois les centres du Ministère.", "",
           "## Géotraitement vectoriel (PostGIS)", "",
           f"`ST_Buffer` (rayon du scénario) → `ST_Union` par scénario → `ST_Intersection` avec la région : table "
           f"`zone_tampon` ({t_tampon:.0f} s). Couverture à vol d'oiseau : centre de l'hexagone dans la zone.", "",
@@ -278,8 +296,9 @@ def rapport(cx, t_tampon, t_reseau, info, stats):
                f"autoroutes exclues, double sens, {VITESSE_MARCHE_KMH} km/h")]), "",
           f"Dijkstra multi-source (graphe inversé, super-nœud relié aux établissements) : {t_reseau:.0f} s. "
           "Table `temps_acces` : temps et établissement le plus proche par hexagone, niveau et mode.", "",
-          *K.tableau(["Niveau", "Mode", "Établissements", "Hexagones injoignables"],
-                     [(n, m, s["etab"], s["injoignables"]) for (n, m), s in stats.items()]), "",
+          *K.tableau(["Niveau", "Mode", "Couverture", "Établissements", "Hexagones injoignables"],
+                     [(n, m, c.replace("_", " "), s["etab"], s["injoignables"])
+                      for (n, m, c), s in stats.items()]), "",
           f"## Population couverte (population 2024 : {K.nombre(total)})", ""]
     lignes = []
     for r in sc.itertuples():
@@ -292,7 +311,8 @@ def rapport(cx, t_tampon, t_reseau, info, stats):
                        K.nombre(p - rr), K.nombre(faux)))
     md += [*K.tableau(["Scénario", "Normatif", "Couverte (tampon)", "Couverte (réseau)",
                        "Non couverte (réseau)", "Dans le tampon mais hors d'atteinte par le réseau"], lignes), "",
-           "La dernière colonne mesure l'erreur d'une analyse à vol d'oiseau.", "",
+           "La dernière colonne mesure l'erreur d'une analyse à vol d'oiseau. Les scénarios _NS (couverture non "
+           "stricte) mesurent l'effet de la règle de couverture stricte du cadrage.", "",
            "## Par province — scénario normatif N1_MARCHE_30", ""]
     d = cov[cov["code_scenario"] == "N1_MARCHE_30"]
     g = d.groupby("code_province").apply(lambda x: pd.Series({

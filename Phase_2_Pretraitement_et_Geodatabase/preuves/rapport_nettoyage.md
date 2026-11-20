@@ -1,6 +1,6 @@
 # Rapport de nettoyage
 
-Exécuté le 2026-11-18 19:11 UTC par `scripts/nettoyage.py` — étapes : communes, etablissements, routes, h3.
+Exécuté le 2026-11-19 20:32 UTC par `scripts/nettoyage.py` — étapes : communes, etablissements, routes, h3.
 
 Sortie : `donnees_propres/base_sante.gpkg`.
 
@@ -48,7 +48,7 @@ Format de la couche source : colonnes déjà normalisées (code_hcp, code_provin
 | Entités supprimées comme doublons | — | 20 |
 | Hors région | 0 | 0 |
 | Sans commune par inclusion (rattachées à la plus proche) | 0 | 0 |
-| Niveaux corrigés par relecture | — | 4 |
+| Niveaux corrigés par relecture | — | 5 |
 
 **Répartition par type et niveau**
 
@@ -58,8 +58,8 @@ Format de la couche source : colonnes déjà normalisées (code_hcp, code_provin
 | centre_sante | 1 | 9 |
 | clinique | 2 | 85 |
 | dentiste | 1 | 61 |
-| hopital | 2 | 47 |
-| hopital | 3 | 4 |
+| hopital | 2 | 46 |
+| hopital | 3 | 5 |
 | medecin | 1 | 58 |
 | pharmacie | 1 | 1245 |
 

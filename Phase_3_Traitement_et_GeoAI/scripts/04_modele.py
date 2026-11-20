@@ -60,7 +60,9 @@ VARIABLES_BASELINE = ["log_pop_k1", "dist_ville_m"]
 
 
 def charger():
-    df = pd.read_sql("SELECT * FROM sante.feature_h3", K.moteur())
+    # ORDER BY : l'ordre des lignes doit être fixe, sinon la forêt aléatoire (bootstrap) varie
+    # d'un rechargement de la base à l'autre malgré la graine
+    df = pd.read_sql("SELECT * FROM sante.feature_h3 ORDER BY h3_index", K.moteur())
     return df
 
 

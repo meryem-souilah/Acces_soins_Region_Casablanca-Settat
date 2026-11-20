@@ -1,6 +1,6 @@
 # Rapport d'accessibilité — règles du référentiel, géotraitement et réseau
 
-Exécuté le 2026-11-18 20:07 UTC par `scripts/01_accessibilite.py`. Couches en EPSG:26191.
+Exécuté le 2026-11-19 20:34 UTC par `scripts/01_accessibilite.py`. Couches en EPSG:26191.
 
 ## Règles métier
 
@@ -19,18 +19,22 @@ Source : *Référentiel de programmation des équipements publics et privés d'i
 
 ## Scénarios
 
-| Scénario | Niveau | Mode | Seuil | Rayon du tampon | Statut |
-| --- | --- | --- | --- | --- | --- |
-| N1_VOITURE_15 | 1 | voiture | 15 min | 10 km | hypothèse |
-| N1_MARCHE_30 | 1 | marche | 30 min | 2.3 km | **normatif** |
-| N2_VOITURE_15 | 2 | voiture | 15 min | 10 km | hypothèse |
-| N2_VOITURE_30 | 2 | voiture | 30 min | 20 km | hypothèse |
-| N2_VOITURE_45 | 2 | voiture | 45 min | 30 km | hypothèse |
-| N3_VOITURE_15 | 3 | voiture | 15 min | 10 km | hypothèse |
-| N3_VOITURE_30 | 3 | voiture | 30 min | 20 km | hypothèse |
-| N3_VOITURE_45 | 3 | voiture | 45 min | 30 km | hypothèse |
+| Scénario | Niveau | Mode | Seuil | Rayon du tampon | Couverture | Statut |
+| --- | --- | --- | --- | --- | --- | --- |
+| N1_VOITURE_15 | 1 | voiture | 15 min | 10 km | stricte | hypothèse |
+| N1_MARCHE_30 | 1 | marche | 30 min | 2.3 km | stricte | **normatif** |
+| N1_MARCHE_30_NS | 1 | marche | 30 min | 2.3 km | non stricte | comparaison (cadrage) |
+| N2_VOITURE_15 | 2 | voiture | 15 min | 10 km | stricte | hypothèse |
+| N2_VOITURE_30 | 2 | voiture | 30 min | 20 km | stricte | hypothèse |
+| N2_VOITURE_45 | 2 | voiture | 45 min | 30 km | stricte | hypothèse |
+| N2_VOITURE_30_NS | 2 | voiture | 30 min | 20 km | non stricte | comparaison (cadrage) |
+| N3_VOITURE_15 | 3 | voiture | 15 min | 10 km | stricte | hypothèse |
+| N3_VOITURE_30 | 3 | voiture | 30 min | 20 km | stricte | hypothèse |
+| N3_VOITURE_45 | 3 | voiture | 45 min | 30 km | stricte | hypothèse |
 
-Raccordement centre d'hexagone → route et route → établissement : 4.6 km/h à pied, 20 km/h en voiture. Couverture stricte : un établissement ne couvre que son niveau.
+Raccordement centre d'hexagone → route et route → établissement : 4.6 km/h à pied, 20 km/h en voiture. Couverture stricte (règle du cadrage) : un établissement ne couvre que son niveau. Couverture non stricte (comparaison prévue au cadrage) : les établissements de niveau supérieur couvrent aussi le niveau étudié.
+
+Niveau 1 = centres de santé et dispensaires du Ministère + cabinets médicaux OSM (cadrage, Phase 0). Les centres de santé OSM restent exclus pour ne pas compter deux fois les centres du Ministère.
 
 ## Géotraitement vectoriel (PostGIS)
 
@@ -43,37 +47,41 @@ Raccordement centre d'hexagone → route et route → établissement : 4.6 km/h 
 | voiture | 228 054 | 590 094 | sens uniques respectés, vitesse du tronçon |
 | marche | 227 304 | 629 562 | autoroutes exclues, double sens, 4.6 km/h |
 
-Dijkstra multi-source (graphe inversé, super-nœud relié aux établissements) : 21 s. Table `temps_acces` : temps et établissement le plus proche par hexagone, niveau et mode.
+Dijkstra multi-source (graphe inversé, super-nœud relié aux établissements) : 33 s. Table `temps_acces` : temps et établissement le plus proche par hexagone, niveau et mode.
 
-| Niveau | Mode | Établissements | Hexagones injoignables |
-| --- | --- | --- | --- |
-| 1 | voiture | 373 | 5 |
-| 2 | voiture | 132 | 5 |
-| 3 | voiture | 4 | 5 |
-| 1 | marche | 373 | 68 |
+| Niveau | Mode | Couverture | Établissements | Hexagones injoignables |
+| --- | --- | --- | --- | --- |
+| 1 | voiture | stricte | 431 | 5 |
+| 2 | voiture | stricte | 131 | 5 |
+| 3 | voiture | stricte | 5 | 5 |
+| 2 | voiture | non stricte | 136 | 5 |
+| 1 | marche | stricte | 431 | 68 |
+| 1 | marche | non stricte | 567 | 68 |
 
 ## Population couverte (population 2024 : 7 688 968)
 
 | Scénario | Normatif | Couverte (tampon) | Couverte (réseau) | Non couverte (réseau) | Dans le tampon mais hors d'atteinte par le réseau |
 | --- | --- | --- | --- | --- | --- |
 | N1_VOITURE_15 | non | 98.7 % | 99.0 % | 77 231 | 61 511 |
-| N1_MARCHE_30 | oui | 77.7 % | 65.8 % | 2 613 218 | 943 124 |
+| N1_MARCHE_30 | oui | 78.1 % | 66.5 % | 2 561 342 | 925 862 |
+| N1_MARCHE_30_NS | non | 78.8 % | 68.4 % | 2 418 352 | 843 087 |
 | N2_VOITURE_15 | non | 77.6 % | 82.1 % | 1 377 176 | 27 470 |
 | N2_VOITURE_30 | non | 88.0 % | 93.7 % | 482 033 | 7 743 |
 | N2_VOITURE_45 | non | 93.9 % | 98.7 % | 100 449 | 2 401 |
+| N2_VOITURE_30_NS | non | 88.0 % | 93.7 % | 482 033 | 7 743 |
 | N3_VOITURE_15 | non | 36.5 % | 46.6 % | 4 105 427 | 1 552 |
 | N3_VOITURE_30 | non | 56.6 % | 68.5 % | 2 418 647 | 298 |
 | N3_VOITURE_45 | non | 65.4 % | 73.8 % | 2 017 527 | 0 |
 
-La dernière colonne mesure l'erreur d'une analyse à vol d'oiseau.
+La dernière colonne mesure l'erreur d'une analyse à vol d'oiseau. Les scénarios _NS (couverture non stricte) mesurent l'effet de la règle de couverture stricte du cadrage.
 
 ## Par province — scénario normatif N1_MARCHE_30
 
 | Province | Population | Hors norme (> 30 min à pied) | Part | Temps moyen pondéré |
 | --- | --- | --- | --- | --- |
-| El Jadida | 907 908 | 466 017 | 51.3 % | 47 min |
+| El Jadida | 907 908 | 428 196 | 47.2 % | 45 min |
 | Nouaceur | 657 615 | 369 929 | 56.3 % | 35 min |
-| Casablanca | 3 218 037 | 360 689 | 11.2 % | 15 min |
+| Casablanca | 3 218 037 | 346 634 | 10.8 % | 15 min |
 | Settat | 648 183 | 337 701 | 52.1 % | 47 min |
 | Sidi Bennour | 451 930 | 295 853 | 65.5 % | 55 min |
 | Berrechid | 639 314 | 280 800 | 43.9 % | 35 min |
@@ -86,10 +94,12 @@ La dernière colonne mesure l'erreur d'une analyse à vol d'oiseau.
 | Scénario | Hexagones habités | Zones blanches (réseau) | Part |
 | --- | --- | --- | --- |
 | N1_VOITURE_15 | 7288 | 278 | 3.8 % |
-| N1_MARCHE_30 | 7252 | 5841 | 80.5 % |
+| N1_MARCHE_30 | 7252 | 5824 | 80.3 % |
+| N1_MARCHE_30_NS | 7252 | 5784 | 79.8 % |
 | N2_VOITURE_15 | 7288 | 4121 | 56.5 % |
 | N2_VOITURE_30 | 7288 | 1563 | 21.4 % |
 | N2_VOITURE_45 | 7288 | 343 | 4.7 % |
+| N2_VOITURE_30_NS | 7288 | 1563 | 21.4 % |
 | N3_VOITURE_15 | 7288 | 6789 | 93.2 % |
 | N3_VOITURE_30 | 7288 | 5561 | 76.3 % |
 | N3_VOITURE_45 | 7288 | 4360 | 59.8 % |

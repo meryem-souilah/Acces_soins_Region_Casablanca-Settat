@@ -73,22 +73,31 @@ Modèle entraîné : `donnees/modele_principal.joblib`.
 | Niveaux 2 et 3 | en voiture, vitesse du tronçon, sens uniques respectés ; seuils 15, 30, 45 min | hypothèses (aucune norme) ; tampon = seuil × 40 km/h |
 | Raccordement | centre de l'hexagone → nœud le plus proche (et nœud → établissement) à 4,6 km/h à pied, 20 km/h en voiture | on ne démarre pas sur la route |
 | Algorithme | Dijkstra multi-source sur le graphe inversé, depuis un super-nœud relié à tous les établissements d'un niveau | un seul calcul par niveau : temps et établissement le plus proche pour chaque hexagone |
-| Couverture | stricte : un établissement ne couvre que son niveau | règle du cadrage |
+| Niveaux de soins | niveau 1 : 373 centres de santé et dispensaires du Ministère + 58 cabinets médicaux OSM (431) ; niveau 2 : 131 hôpitaux et cliniques ; niveau 3 : 4 sites (CHU Ibn Rochd et son site du 20 Août, hôpital universitaire Cheikh Khalifa, CHR Moulay Youssef) | définition du cadrage (Phase 0) ; centres de santé OSM exclus (doublons des centres du Ministère) |
+| Couverture | stricte : un établissement ne couvre que son niveau ; **non stricte** en comparaison (scénarios `_NS`) : un niveau supérieur couvre aussi les niveaux inférieurs | règle du cadrage et comparaison qu'il prévoyait |
 
 **Résultats principaux** (population 2024) :
 
 | Scénario | Statut | Couverte à vol d'oiseau | Couverte par le réseau | Hors d'atteinte malgré le tampon |
 | --- | --- | --- | --- | --- |
-| Niveau 1, 30 min à pied | **normatif** | 77,7 % | **65,8 %** | 943 000 hab. |
-| Niveau 2, 30 min en voiture | hypothèse | 88,0 % | 93,7 % | 7 700 hab. |
+| Niveau 1, 30 min à pied | **normatif** | 78,1 % | **66,5 %** | 925 862 hab. |
+| Niveau 1, 30 min à pied, couverture non stricte | comparaison | 78,8 % | 68,4 % | 843 087 hab. |
+| Niveau 2, 30 min en voiture | hypothèse | 88,0 % | 93,7 % | 7 743 hab. |
+| Niveau 2, 30 min en voiture, couverture non stricte | comparaison | 88,0 % | 93,7 % | 7 743 hab. |
 | Niveau 3, 45 min en voiture | hypothèse | 65,4 % | 73,8 % | 0 |
 
-- **2,6 millions d'habitants sont hors norme d'accès au premier recours.** La part dépasse 50 % à Sidi
-  Bennour, Benslimane, Nouaceur, Settat et El Jadida.
-- L'analyse à vol d'oiseau surestime la couverture à pied : **943 000 habitants** sont à moins de 2,3 km d'un
-  centre, mais à plus de 30 min par le réseau.
-- Capacité : les communes urbaines ont 199 centres de niveau 1 pour 255 requis (1 pour 25 000 hab.),
-  soit **61 manquants** (Casablanca −23, Dar Bouazza −6, Bouskoura −4).
+- **2,56 millions d'habitants sont hors norme d'accès au premier recours.** La part dépasse 50 % à Sidi
+  Bennour, Benslimane, Nouaceur et Settat (El Jadida : 47 %).
+- L'analyse à vol d'oiseau surestime la couverture à pied : **925 862 habitants** sont à moins de 2,3 km d'un
+  établissement de niveau 1, mais à plus de 30 min par le réseau.
+- Couverture non stricte : compter les hôpitaux et CHU comme soins de proximité n'ajoute que 1,9 point
+  (142 990 hab.) ; au niveau 2, aucun effet (les CHU sont à Casablanca, déjà couverte). La règle stricte du
+  cadrage ne change donc pas le diagnostic.
+- Cabinets médicaux : les ajouter au niveau 1 fait passer la couverture de 65,8 % à 66,5 % ; les 58 cabinets
+  recensés par OSM sont surtout urbains (38 à Casablanca, 15 à El Jadida).
+- Capacité : les communes urbaines ont 199 centres de santé publics pour 255 requis (1 CSU pour 25 000 hab.),
+  soit **61 manquants** (Casablanca −23, Dar Bouazza −6, Bouskoura −4). Les cabinets privés ne sont pas
+  comptés : la règle porte sur le centre de santé urbain public.
 
 ### 3.2 Critères de localisation
 
@@ -154,16 +163,17 @@ les coordonnées (le modèle apprendrait la carte au lieu du contexte).
 | Modèle | Rôle | F1 macro | Exactitude équilibrée | F1 hors norme | F1 desservi | ROC-AUC |
 | --- | --- | --- | --- | --- | --- | --- |
 | Classe majoritaire | baseline | 0,462 | 0,500 | 0,924 | 0,000 | 0,500 |
-| Logistique 2 variables | baseline | 0,640 | 0,701 | 0,856 | 0,424 | 0,796 |
-| **Forêt aléatoire** (`max_depth=8`, `min_samples_leaf=5`) | **principal** | **0,718** | **0,725** | 0,917 | 0,518 | **0,844** |
-| Gradient boosting | candidat | 0,727 | 0,726 | 0,924 | 0,530 | 0,808 |
+| Logistique 2 variables | baseline | 0,641 | 0,702 | 0,856 | 0,427 | 0,798 |
+| **Forêt aléatoire** (`max_depth=8`, `min_samples_leaf=5`) | **principal** | **0,722** | 0,733 | 0,917 | 0,526 | **0,844** |
+| Gradient boosting | candidat | 0,715 | 0,746 | 0,906 | 0,524 | 0,827 |
 
 - Le modèle principal dépasse la baseline simple de **+0,08 en F1 macro** et **+0,05 en ROC-AUC**.
-- La forêt aléatoire est retenue parce qu'elle a le meilleur score en CV spatiale (0,755 contre 0,750). Le
-  boosting fait légèrement mieux sur le test, mais ce n'est pas un critère de choix légitime.
-- **CV aléatoire contre CV spatiale** : +0,029 (forêt) et +0,042 (boosting). La validation aléatoire est
+- La forêt aléatoire est retenue parce qu'elle a le meilleur score en CV spatiale (0,761 contre 0,752), règle
+  fixée avant de regarder le test. Sur le test, elle a aussi le meilleur F1 macro (0,722 contre 0,715).
+- Résultats reproductibles : graine 42 et lecture des variables dans un ordre fixe (`ORDER BY h3_index`).
+- **CV aléatoire contre CV spatiale** : +0,026 (forêt) et +0,040 (boosting). La validation aléatoire est
   optimiste, ce qui confirme la nécessité du découpage spatial.
-- Variables les plus utiles : population de la commune, population du voisinage, distance à la ville.
+- Variables les plus utiles : population du voisinage, population de la commune, distance à la ville.
 
 ### Intégration PostGIS
 
@@ -196,8 +206,10 @@ SELECT (2.0 * vp / (2 * vp + fp + fn) + 2.0 * vn / (2 * vn + fn + fp)) / 2 AS f1
   pied est donc surestimé en zone rurale.
 - Vitesse à pied uniforme (4,6 km/h, déduite de la norme) ; en voiture, 94 % des tronçons ont une vitesse
   par défaut selon leur type.
-- 93 centres du Ministère ont une position approchée (centre habité de la commune) ; 68 hexagones
-  (≈ 38 000 hab.) ne sont reliés qu'à des autoroutes et sont exclus du scénario à pied.
+- Cabinets médicaux : OSM n'en recense que 58, presque tous urbains ; l'offre privée de proximité est
+  sous-estimée, surtout en zone rurale.
+- 93 centres du Ministère ont une position approchée (centre habité de la commune) ; 38 hexagones
+  habités (37 908 hab.) ne sont reliés qu'à des autoroutes et sont exclus du scénario à pied.
 - Les seuils des niveaux 2 et 3 sont des hypothèses : le référentiel n'en donne pas.
 - La règle de capacité des CSU ne concerne que les communes urbaines ; le référentiel ne traite pas les
   centres ruraux (CSR, dispensaires). La commune de Casablanca est traitée en bloc, pas par arrondissement.
@@ -210,12 +222,12 @@ SELECT (2.0 * vp / (2 * vp + fp + fn) + 2.0 * vn / (2 * vn + fn + fp)) / 2 AS f1
 
 **Modèle**
 - La cible est calculée, pas observée : elle hérite des hypothèses ci-dessus.
-- **Erreurs regroupées dans l'espace** (I de Moran des résidus = 0,63), surtout en périphérie des bourgs.
+- **Erreurs regroupées dans l'espace** (I de Moran des résidus = 0,64), surtout en périphérie des bourgs.
   Le modèle ne connaît pas la position des centres (règle anti-fuite), or c'est elle qui décide de la
   desserte à ces limites. Il reconnaît des contextes ; il ne remplace pas le calcul réseau, exact quand les
   établissements sont connus.
-- Classe « desservi » moins bien reconnue (F1 0,52) que la classe « hors norme » (F1 0,92).
-- Les blocs de test sont plus ruraux que l'entraînement (85,9 % contre 78,9 % de zones hors norme).
+- Classe « desservi » moins bien reconnue (F1 0,53) que la classe « hors norme » (F1 0,92).
+- Les blocs de test sont plus ruraux que l'entraînement (85,9 % contre 78,6 % de zones hors norme).
 - Variables de population corrélées : leur importance par permutation est partagée et reste faible.
 - WorldPop date de 2020 et n'est recalé sur le RGPH 2024 qu'au niveau communal.
 

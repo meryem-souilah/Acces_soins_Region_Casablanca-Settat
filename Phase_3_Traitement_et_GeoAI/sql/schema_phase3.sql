@@ -40,12 +40,15 @@ CREATE TABLE scenario_acces (
     normatif          boolean     NOT NULL,
     code_norme        varchar(10) REFERENCES norme_referentiel (code_norme),
     justification     text        NOT NULL,
+    couverture        varchar(12) NOT NULL DEFAULT 'stricte',
     CONSTRAINT scenario_mode CHECK (mode IN ('marche', 'voiture')),
+    CONSTRAINT scenario_couverture CHECK (couverture IN ('stricte', 'non_stricte')),
     CONSTRAINT scenario_normatif_source CHECK (NOT normatif OR code_norme IS NOT NULL)
 );
 COMMENT ON TABLE scenario_acces IS
     'normatif = règle du référentiel (niveau 1 : 2,3 km / 30 min à pied) ; sinon hypothèse de travail '
-    '(niveaux 2 et 3 : le référentiel ne fixe aucun temps d''accès)';
+    '(niveaux 2 et 3 : le référentiel ne fixe aucun temps d''accès). couverture stricte : seuls les '
+    'établissements du niveau couvrent ; non stricte (comparaison prévue au cadrage) : ceux du niveau ou supérieurs';
 
 
 -- 3. Géotraitement vectoriel : tampons fusionnés par scénario, découpés sur la région
@@ -63,11 +66,13 @@ CREATE TABLE temps_acces (
     h3_index     varchar(15) REFERENCES maille_h3 (h3_index) ON DELETE CASCADE,
     code_niveau  smallint    REFERENCES niveau_soin (code_niveau),
     mode         varchar(10),
+    couverture   varchar(12) NOT NULL DEFAULT 'stricte',
     temps_min    real        NOT NULL,
     id_etab      integer     NOT NULL REFERENCES etablissement (id_etab) ON DELETE CASCADE,
-    PRIMARY KEY (h3_index, code_niveau, mode),
+    PRIMARY KEY (h3_index, code_niveau, mode, couverture),
     CONSTRAINT temps_positif CHECK (temps_min >= 0),
-    CONSTRAINT temps_mode CHECK (mode IN ('marche', 'voiture'))
+    CONSTRAINT temps_mode CHECK (mode IN ('marche', 'voiture')),
+    CONSTRAINT temps_couverture CHECK (couverture IN ('stricte', 'non_stricte'))
 );
 CREATE INDEX temps_acces_etab_idx ON temps_acces (id_etab);
 
@@ -107,7 +112,7 @@ JOIN (SELECT code_hcp, sum(population) AS pop_wp FROM maille_h3 GROUP BY code_hc
 -- 7. Couverture par hexagone et scénario : à vol d'oiseau (tampon) et par le réseau
 CREATE VIEW v_couverture_h3 AS
 SELECT p.h3_index, p.code_hcp, c.code_province, s.code_scenario, s.code_niveau, s.mode,
-       s.seuil_min, s.normatif, p.pop_2024, t.temps_min,
+       s.couverture, s.seuil_min, s.normatif, p.pop_2024, t.temps_min,
        (t.temps_min <= s.seuil_min) AS couvert_reseau,
        EXISTS (SELECT 1 FROM zone_tampon z
                WHERE z.code_scenario = s.code_scenario
@@ -116,20 +121,23 @@ SELECT p.h3_index, p.code_hcp, c.code_province, s.code_scenario, s.code_niveau, 
 FROM v_maille_pop p
 JOIN commune c USING (code_hcp)
 JOIN scenario_acces s ON true
-JOIN temps_acces t ON t.h3_index = p.h3_index AND t.code_niveau = s.code_niveau AND t.mode = s.mode;
+JOIN temps_acces t ON t.h3_index = p.h3_index AND t.code_niveau = s.code_niveau AND t.mode = s.mode
+                  AND t.couverture = s.couverture;
 
 
 -- 8. Règles de capacité du référentiel
 -- Niveau 1 : un CSU pour 25 000 habitants au moins (CSU-1), dans les communes urbaines.
 -- Le code HCP d'une commune urbaine (municipalité, arrondissements) a « 01 » en 3e partie.
+-- La règle porte sur les centres de santé publics : on compte les centres du Ministère
+-- (source msps), pas les cabinets médicaux privés, qui sont pourtant de niveau 1.
 CREATE VIEW v_capacite_commune AS
 SELECT c.code_hcp, c.nom, c.code_province,
        (split_part(c.code_hcp, '.', 3) = '01') AS urbaine,
        c.pop_2024,
-       count(e.id_etab) FILTER (WHERE e.code_niveau = 1 AND t.inclus_analyse) AS nb_niveau1,
+       count(e.id_etab) FILTER (WHERE e.code_niveau = 1 AND t.inclus_analyse AND e.source = 'msps') AS nb_niveau1,
        ceil(c.pop_2024 / 25000.0)::int AS nb_requis_csu,
-       c.pop_2024 / NULLIF(count(e.id_etab) FILTER (WHERE e.code_niveau = 1 AND t.inclus_analyse), 0)
-           AS hab_par_centre
+       c.pop_2024 / NULLIF(count(e.id_etab) FILTER (WHERE e.code_niveau = 1 AND t.inclus_analyse
+                                                    AND e.source = 'msps'), 0) AS hab_par_centre
 FROM commune c
 LEFT JOIN etablissement e USING (code_hcp)
 LEFT JOIN type_etablissement t USING (code_type)

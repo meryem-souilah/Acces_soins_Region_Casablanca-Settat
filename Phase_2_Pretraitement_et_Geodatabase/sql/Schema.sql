@@ -164,7 +164,8 @@ INSERT INTO type_etablissement (code_type, libelle, tags_osm, milieu, inclus_ana
     ('hopital',      'Hôpital',                       'amenity=hospital ; healthcare=hospital',      NULL, true,  2),
     ('clinique',     'Clinique',                      'amenity=clinic ; healthcare=clinic',          NULL, true,  2),
     ('centre_sante', 'Centre de santé (OSM)',         'healthcare=centre ; nom « centre de santé »', NULL, false, 1),
-    ('medecin',      'Cabinet médical',               'amenity=doctors ; healthcare=doctor',         NULL, false, 1),
+    -- Cabinet médical : niveau 1 « soins de proximité » comme le prévoit le cadrage (Phase 0)
+    ('medecin',      'Cabinet médical',               'amenity=doctors ; healthcare=doctor',         NULL, true,  1),
     ('dentiste',     'Cabinet dentaire',              'amenity=dentist ; healthcare=dentist',        NULL, false, 1),
     ('pharmacie',    'Pharmacie',                     'amenity=pharmacy ; healthcare=pharmacy',      NULL, false, 1),
     ('autre',        'Autre / non classé',            'tout autre tag healthcare (laboratoire, kiné…)', NULL, false, 1);

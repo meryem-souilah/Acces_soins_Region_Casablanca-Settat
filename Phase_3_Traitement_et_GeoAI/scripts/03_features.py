@@ -73,6 +73,7 @@ JOIN sante.commune c USING (code_hcp)
 JOIN sante.aptitude_h3 a USING (h3_index)
 JOIN sante.scenario_acces s ON s.code_scenario = '{SCENARIO}'
 JOIN sante.temps_acces t ON t.h3_index = p.h3_index AND t.code_niveau = s.code_niveau AND t.mode = s.mode
+                        AND t.couverture = s.couverture
 WHERE p.pop_2024 > 0
 """
 

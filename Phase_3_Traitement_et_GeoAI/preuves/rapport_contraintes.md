@@ -1,6 +1,6 @@
 # Rapport — critères de localisation du référentiel
 
-Exécuté le 2026-11-18 20:10 UTC par `scripts/02_contraintes_localisation.py` (35 s). Couches en EPSG:26191.
+Exécuté le 2026-11-19 20:35 UTC par `scripts/02_contraintes_localisation.py` (46 s). Couches en EPSG:26191.
 
 Règles : référentiel EPPIG 2016, p. 39 (« Critères de localisation des équipements de santé »). Le référentiel ne chiffre aucune distance : **100 m** d'éloignement des nuisances et **2 km** pour la proximité des grands axes sont des hypothèses de travail.
 

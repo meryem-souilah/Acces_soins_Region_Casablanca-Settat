@@ -34,7 +34,7 @@ Après une correction, relancer les étapes concernées puis l'étape 3.
 ## Choix de modélisation
 
 - **Population** : légale RGPH 2024 par commune (`commune.pop_2024`, jointure par code HCP, total = 7 688 967) ; maillée WorldPop 2020 par hexagone H3 de résolution 8 (`maille_h3.population`), pour répartir la demande à l'intérieur des communes.
-- **Établissements** : une seule table. `source` = `osm` ou `msps`, `precision_geom` = origine de la position. Les types du Ministère (CSU, CSR, DR) portent les soins primaires publics. Les centres de santé, cabinets et pharmacies OSM sont gardés en base mais exclus du calcul (`type_etablissement.inclus_analyse = false`), ce qui évite de compter deux fois le même centre.
+- **Établissements** : une seule table. `source` = `osm` ou `msps`, `precision_geom` = origine de la position. Les types du Ministère (CSU, CSR, DR) portent les soins primaires publics ; les cabinets médicaux OSM sont aussi de niveau 1, comme le prévoit le cadrage (Phase 0). Les centres de santé OSM, dentistes, pharmacies et laboratoires sont gardés en base mais exclus du calcul (`type_etablissement.inclus_analyse = false`) ; écarter les centres de santé OSM évite de compter deux fois les centres du Ministère.
 - **Réseau** : graphe orienté (`sens_unique`), une seule composante connexe ; vitesse OSM `maxspeed`, sinon une vitesse par défaut selon le type de voie (94 % des tronçons, une limite à rappeler dans l'analyse).
 
 ## État et limites connues
